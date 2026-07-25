@@ -157,13 +157,81 @@
 - **Verified:** ran on .NET 10 (2026-07-22): process died with "Stack
   overflow." mid-loop; CA2014 fired at compile time.
 
+### large-array-born-in-gen2 (A6)
+
+- **Twist:** `new byte[100_000]` is born in generation 2 - a fresh, just-now
+  allocation the GC treats as old - so it survives the gen-0 collections that
+  reclaim everything else, and a short-lived big buffer lingers until the next
+  rare full GC.
+- **Mechanic:** allocations >= 85,000 bytes go on the Large Object Heap, which
+  is collected only during a gen-2 (full) GC. `GC.GetGeneration` reports 2 for
+  the large array and 0 for a small one at the same age. So a dead large array
+  is *not* freed by the frequent gen-0/gen-1 collections; only a full GC
+  reclaims it - the opposite of the "allocate, drop, it's gone" intuition that
+  holds for small objects.
+- **Who hits it:** short-lived large buffers churned in a request/loop - image
+  and file byte[], large `List`/`StringBuilder` backing stores, big
+  serialization buffers - allocated and discarded fast, expecting gen-0 to
+  sweep them; instead they pile up between full GCs (and the LOH is not
+  compacted by default, so the space fragments).
+- **Repro:** `GC.GetGeneration(new byte[100_000])` is 2, `new byte[1_000]` is
+  0; weak-ref both from a NoInlining helper, drop the strong refs,
+  `GC.Collect(0)` - the small one is dead, the large one is still alive;
+  a full `GC.Collect()` finally frees it. Deterministic, no packages.
+- **Damage:** memory that the profiler shows "leaking" between full GCs even
+  though every large buffer is dead - allocation rate looks fine, working set
+  climbs, and the "leak" vanishes each time a full GC happens, so it reads as
+  a phantom.
+- **😈 seed:** the size threshold is invisible in code - one row wider, one
+  field longer, and a buffer that lived in gen 0 for years silently crosses
+  85,000 bytes into the LOH, changing its GC lifetime with no code change at
+  the allocation site.
+- **Verified:** ran on .NET 10 (2026-07-24): gen 2 vs gen 0 for the two
+  arrays; after GC.Collect(0) the small array was reclaimed and the large one
+  survived; a full GC.Collect() reclaimed it.
+
+### finalizer-delays-gc (A6)
+
+- **Twist:** giving a class a finalizer *keeps its objects alive longer*: the
+  finalizer does not run during the collection that finds the object dead - it
+  is queued and run later - so the object, and everything it references,
+  survives that GC and needs a second one to actually free.
+- **Mechanic:** an object with a finalizer is put on the finalization queue
+  when detected unreachable; the finalizer thread runs it afterwards, and only
+  a subsequent GC reclaims the memory. Proof via a finalizer flag: after the
+  first `GC.Collect()` the flag is still false (finalizer not yet run, object
+  survived); after `GC.WaitForPendingFinalizers()` it is true; a second GC
+  reclaims it. A *plain* object of the same shape is gone after the first GC.
+  BUILDER NOTE: a *short* WeakReference reports the finalizable object dead
+  immediately (it tracks root-reachability, not the queue) - use a
+  `trackResurrection: true` (long) WeakReference or the finalizer flag to
+  observe the survival honestly. NoInlining helper so the local doesn't pin it.
+- **Who hits it:** classes that add a finalizer "to be safe" (or inherit one
+  through a SafeHandle/unmanaged wrapper) and hold large managed graphs -
+  every such object costs two GC cycles and a finalizer-thread hop to reclaim,
+  and a slow finalizer backs the whole queue up.
+- **Repro:** a `~Tracked()` sets a static flag; after one `GC.Collect()` the
+  flag is false (survived), after `WaitForPendingFinalizers` true; a long
+  WeakReference is alive after the 1st GC and dead after finalize + 2nd GC,
+  while a plain object dies on the 1st. Deterministic, no packages.
+- **Damage:** memory pressure and promotion from objects that "should be
+  gone" - finalizable objects get promoted to the next generation while they
+  wait, so they live longer and collect in rarer, more expensive GCs; a
+  finalizer that blocks stalls finalization for everyone.
+- **NOTE (curator):** the two-collect + WeakReference technique also appears
+  in disposal's the-cleanup-that-never-came (which proves the *opposite* -
+  no finalizer means Dispose never runs). Same instrument, opposite lesson;
+  cross-link, keep distinct.
+- **😈 seed:** `GC.SuppressFinalize(this)` in Dispose exists precisely to undo
+  this cost - so forgetting it in a Dispose pattern silently keeps the
+  two-GC penalty even for objects you disposed promptly.
+- **Verified:** ran on .NET 10 (2026-07-24): finalizer flag false after the
+  1st GC and true after WaitForPendingFinalizers; long WeakReference alive
+  after 1st GC, dead after finalize + 2nd GC; plain object dead after 1st GC.
+
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
-
-- **memory:** a fresh 85 KB array is born directly in gen 2 (the LOH) -
-  deterministic to show, but the damage story (fragmentation OOM) cannot be
-  reproduced honestly in one file; wait for a deterministic failure angle.
 
 - **memory:** a blocking finalizer stalls the process's single finalizer
   thread, freezing ALL finalization - real, but the in-file proof needs a
@@ -177,11 +245,6 @@ Not yet a full candidate - brainstorm before proposing.
   is still running (GC.KeepAlive exists for exactly this) - a genuine
   "wait, WHAT?", but it reproduces only under Release codegen; find a
   pinned-configuration technique for file-based dotnet run first.
-
-- **finalizer-delays-gc** (A6) - an object with a finalizer survives the
-  collection that should have freed it (finalization queue, needs a second
-  GC), provable with a WeakReference. The two-collect dance already appears
-  inside disposal's the-cleanup-that-never-came repro - coordinate.
 
 - **memory:** a WeakReference checked and then used after a collection -
   race-shaped; promote only with a hard deterministic assertion.
