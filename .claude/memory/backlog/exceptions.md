@@ -52,29 +52,121 @@
   false, original exception reached the outer catch, filter's NRE
   unobservable.
 
+### poisoned-static-constructor (A5,6)
+
+- **Twist:** the config was missing for one second at startup, the static
+  constructor threw, and now the type is dead for the life of the
+  process - every later access throws TypeInitializationException with the
+  *original* error, long after the config came back.
+- **Mechanic:** a type initializer runs at most once; if it throws, the
+  CLR caches the failure and re-throws the same TypeInitializationException
+  (wrapping the original in `.InnerException`) on every subsequent access -
+  the static ctor never runs again. So a transient cause (a config not yet
+  loaded, a env var set a moment later, a dependency still warming up)
+  becomes permanent. No restart-free recovery exists.
+- **Who hits it:** static holders initialized from config/environment -
+  `static readonly` clients, cached settings, registries - touched during
+  a cold start or a brief outage window; the first unlucky access poisons
+  the type for everyone after.
+- **Repro:** a `static Registry` whose ctor throws while a flag is set;
+  access it (TypeInitializationException), clear the flag ("we fixed the
+  config"), access again - still TypeInitializationException with the same
+  inner. Deterministic, no packages.
+- **Damage:** one transient blip at startup takes a subsystem down until
+  restart - and the error everyone sees (TypeInitializationException) names
+  the type, not the config that was briefly missing, so the fix (already
+  applied) looks like it did nothing.
+- **😈 seed:** the wrapper hides the cause and the caching hides the
+  timing - by the time anyone reads the log the real error is gone from
+  the environment and buried one `.InnerException` deep, so the incident
+  reads as "the type just refuses to load".
+- **Verified:** ran on .NET 10 (2026-07-24): first access threw
+  TypeInitializationException (inner InvalidOperationException); after
+  clearing the cause, two further accesses threw the same, ctor never
+  re-ran.
+
+### result-wraps-await-unwraps (A4,5)
+
+- **Twist:** the same faulted task throws two different exception *types*
+  depending on how you wait: `catch (TimeoutException)` fires around
+  `await task` and silently misses around `task.Result` - because blocking
+  wraps the failure in AggregateException and awaiting unwraps it.
+- **Mechanic:** `.Result` and `.Wait()` throw AggregateException (the real
+  error is `.InnerException`); `await` and `GetAwaiter().GetResult()` throw
+  the original exception directly. So a typed catch written against one
+  waiting style is dead code around the other - and refactors routinely
+  swap `await` for `.Result` (or back) without touching the catch.
+- **Who hits it:** sync-over-async call sites - constructors, property
+  getters, `ISomething` implementations that can't be async - reaching for
+  `.Result`/`.Wait()` under a `catch (SpecificException)` copied from the
+  async path.
+- **Repro:** one `async Task FailAsync()` that throws TimeoutException,
+  awaited four ways: `.Result` and `.Wait()` surface AggregateException
+  (typed catch missed), `await` and `GetAwaiter().GetResult()` surface
+  TimeoutException (caught). Deterministic, no packages.
+- **Damage:** typed recovery - retry, fallback, user-facing message -
+  silently skipped on the blocking path; the generic handler logs
+  "AggregateException" while the actionable type hides one level deeper.
+- **ADJACENCY (curator):** same wrapping family as
+  activator-hides-the-real-error (TargetInvocationException) - different
+  API, same lie; and distinct from #0021 whenall-hides-exceptions, which
+  is about *await* dropping all-but-first of *many* exceptions. This one is
+  the single-exception type divergence between blocking and awaiting.
+  Cross-link both.
+- **😈 seed:** `GetAwaiter().GetResult()` - the "unwrap the aggregate" fix
+  people reach for - unwraps a single exception but, on a WhenAll-style
+  task with several, still hands you only the first, quietly reintroducing
+  #0021's loss.
+- **Verified:** ran on .NET 10 (2026-07-24): `.Result` and `.Wait()` threw
+  AggregateException (inner TimeoutException); `await` and
+  `GetAwaiter().GetResult()` threw TimeoutException.
+
+### filter-side-effects-fire-anyway (A5)
+
+- **Twist:** `catch (Exception e) when (Audit(e))` looks like it audits the
+  exceptions this block handles - but the filter runs for exceptions it
+  *doesn't* handle too: it fires even when it returns false, and before any
+  `finally` unwinds, so the "audit on handling" logs handling that never
+  happens.
+- **Mechanic:** exception filters evaluate in the first pass of exception
+  dispatch, before the stack unwinds and before finally blocks run - and
+  they evaluate whether or not they ultimately match. A filter with a side
+  effect (audit, increment, log, mutate) therefore executes for every
+  exception that reaches the catch clause, including ones it rejects and
+  ones an outer handler will take. Verified ordering: the filter ran, then
+  the finally ran.
+- **Who hits it:** filters doing real work - `when (LogAndCheck(e))`,
+  `when (Metrics.Count(e) && e.Code == retryable)`, `when
+  (Audit(e))` - written on the belief that the guard only runs for handled
+  exceptions.
+- **Repro:** a filter returning false whose body increments an audit
+  counter: the counter advances though the catch body never runs and an
+  outer catch takes the exception; a second case prints the filter running
+  before the inner `finally`. Deterministic, no packages.
+- **Damage:** double-counted metrics, audit entries for exceptions that
+  were never handled here, and side effects ordered before cleanup that
+  the author assumed ran after - a quietly wrong observability and control
+  layer built on a mis-timed guard.
+- **ADJACENCY:** the-swallowed-filter above is the other `when` lie (a
+  *throwing* filter is swallowed and counts as false); this is the
+  *side-effecting* filter firing when it shouldn't. Two exhibits, one
+  feature - cross-link, keep distinct.
+- **😈 seed:** it makes the filter a covert probe: put a side effect in a
+  `when` that always returns false and it runs on every matching-type
+  exception in the program while never handling one - observable behavior
+  from a catch that, by its own verdict, does nothing.
+- **Verified:** ran on .NET 10 (2026-07-24): filter side effect fired on a
+  false verdict (outer catch took the exception), and ran before the inner
+  finally.
+
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
 
-- **exceptions:** a throw inside `finally` *replaces* the in-flight
-  exception - the original error vanishes entirely. Real and deterministic;
-  MUST check overlap with #0017 (finally-that-lied) before promoting.
-
-- **poisoned-static-constructor** (A5,6) - a static constructor that throws
-  once poisons the type for the life of the process: every later access
-  throws TypeInitializationException wrapping the original, long after the
-  transient cause is gone.
-
-- **aggregateexception-hides-the-type** (A5) - blocking on a task with
-  `.Result`/`.Wait()` wraps the real failure in AggregateException, so
-  `catch (TimeoutException)` never fires - the exception you handle is not
-  the one that was thrown.
-
-- **exception-filter-runs-anyway** (A5) - a `catch (...) when (Audit(e))`
-  filter runs *before* the stack unwinds and runs even when it returns false -
-  side effects in the guard fire for exceptions you never handled. Adjacent
-  to the-swallowed-filter (same feature, different lie) - keep them distinct
-  or fold as its 😈.
+- **Dead end (verified 2026-07-24, do not re-derive):** "a throw inside
+  `finally` replaces the in-flight exception" IS shipped #0017
+  (finally-that-lied) - its exact mechanic, confirmed against the README.
+  Not a separate candidate.
 
 - **exceptions:** rethrow across an await boundary (the stack is already
   rebuilt). Its former sibling here - "using swallows the body's exception
