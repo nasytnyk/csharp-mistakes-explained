@@ -128,3 +128,62 @@
   reference, filled boxed as Int32; HasValue worked while GetType() threw
   NRE; the settings-bag (int) cast threw NRE; a plain box unboxed into
   int? cleanly.
+
+### ternary-unifies-then-boxes (A4,5)
+
+- **Twist:** `object x = useInt ? 5 : 3.14;` is a `double` even when `useInt`
+  is true - the conditional expression unifies both arms to one compile-time
+  type, so the box captures `5.0`, not `5`; `x is int` is false and `case 5`
+  misses.
+- **Mechanic:** a `?:` expression has a single type computed from both arms
+  at compile time (here `int` and `double` unify to `double`); the runtime
+  branch does not change it. Assigning to `object` boxes that unified type,
+  so a true branch that "returns an int" actually boxes a double. Same trap
+  with `int`/`long` (unifies to `long`), `int`/`decimal`, etc. Nothing warns.
+- **Who hits it:** building an `object`-typed value with a ternary - a
+  parameter bag, a `Dictionary<string,object>`, a params array, a
+  serializer input - where one arm is a whole number and the other is
+  fractional or wider.
+- **Repro:** `object r = useInt ? 5 : 3.14;` prints type Double, `r is int`
+  false, a `case 5` switch falls to default; `useInt ? 1 : 2L` boxes Int64.
+  Deterministic, no packages.
+- **Damage:** downstream `is int` / `case int` / unbox to int silently miss
+  or throw for a value that "is obviously 5" - the dispatcher takes the
+  default branch, or `(int)r` throws (see unbox-must-match-exact-type),
+  keyed to a fractional arm the true path never touched.
+- **😈 seed:** the fix people try - casting the fractional arm, `useInt ? 5
+  : (int)3.14` - "works" by truncating 3.14 to 3, silently corrupting the
+  other branch to make the type line up; the real fix is boxing each arm
+  explicitly (`(object)5 : (object)3.14`).
+- **Verified:** ran on .NET 10 (2026-07-24): `useInt ? 5 : 3.14` boxed as
+  Double, `is int` false, switch missed; `1 : 2L` boxed as Int64.
+
+### boxed-enum-isnt-its-number (A4,5)
+
+- **Twist:** `(int)(object)Color.Red` unboxes fine to 0 - but
+  `((object)Color.Red).Equals(0)` is false, and a `Dictionary<object>` keyed
+  by the enum is not found by a boxed `0`: the cast treats an enum as its
+  number, `Equals` and hashing do not.
+- **Mechanic:** a boxed enum carries its enum type; `Equals` between two
+  boxes requires the same runtime type, so a boxed enum and a boxed
+  underlying int are never equal (both directions), and they hash into
+  different dictionary buckets. Unboxing is the one operation that bridges
+  enum and underlying (see unbox-must-match-exact-type) - so the same pair
+  is interchangeable by cast and disjoint by Equals.
+- **Who hits it:** `object`-typed storage that mixes enums and their numbers
+  from different sources - a config/JSON layer that reads a status as `int`
+  while code stores it as the enum, both dropped into a
+  `Dictionary<object,handler>` or compared with `.Equals`.
+- **Repro:** `(int)(object)Color.Red` is 0; `((object)Color.Red).Equals(0)`
+  and `((object)0).Equals(Color.Red)` both false; a dict keyed by the enum
+  is found by the enum, missed by boxed `0`. Deterministic, no packages.
+- **Damage:** a handler lookup or equality check that silently misses across
+  the enum/int boundary - the enum path works in tests, the int-from-JSON
+  path in production falls through to the default, on data that "is the same
+  value".
+- **😈 seed:** the cast working is the trap's cover: a reviewer checks
+  `(int)key == 0`, sees it pass, and concludes the boxed forms are
+  interchangeable - but every `Equals`/dictionary/`Contains` in the code
+  disagrees with the cast they tested.
+- **Verified:** ran on .NET 10 (2026-07-24): cast to int gave 0, both
+  Equals directions false, dict missed by boxed int and hit by the enum.
