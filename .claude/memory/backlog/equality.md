@@ -33,10 +33,15 @@
 
 Not yet a full candidate - brainstorm before proposing.
 
-- **equality:** default struct Equals on floating-point fields is *bitwise*
-  when the struct has no reference fields - so +0.0 vs -0.0 and NaN behave
-  opposite to `==` on the same values. Deep-weeds; needs a floor-clearing
-  frame and a premise run before proposing.
+- **equality:** default struct Equals over float/double fields diverges from
+  `==` - but NOT bitwise as long assumed. Verified 2026-07-24:
+  ValueType.Equals delegates to each field's `double.Equals`, so
+  `Vec(0.0).Equals(Vec(-0.0))` is **true** and `Vec(NaN).Equals(Vec(NaN))`
+  is **true**, while `==` says the opposite on NaN (false) and agrees on +0
+  (true). So the real divergence is only on NaN (Equals true, == false) -
+  which is shipped #0029 (nan-poisons-comparison) reached through a struct
+  wrapper. Do not propose the "bitwise" framing; if revisited, it is a
+  struct-flavored cross-link to #0029, not a new mechanic.
 
 - **equals-without-gethashcode** (A2) - override Equals but not GetHashCode
   and the object works in `List.Contains` yet goes missing in a HashSet or

@@ -51,3 +51,61 @@
 - **😈 seed:** `Enabled = true` flips to false the same way - a permission or
   feature silently defaults OFF only on the code path that used an array.
 - **Verified:** ran on .NET 10 (2026-07-22): 1.5 / 0 / 0 exactly as above.
+
+### the-copy-returning-getter (A3)
+
+- **Twist:** `player.Position.MoveBy(10)` compiles, runs, and moves nothing -
+  a property getter returns a *copy* of the struct, so the method mutates a
+  temporary that is discarded; the identical struct exposed as a *field*
+  moves for real.
+- **Mechanic:** a property getter that returns a struct returns a fresh
+  copy; a mutating method called on that copy changes only the temporary.
+  The assignment form `player.Position.X = 5` at least fails to compile
+  (CS1612 "cannot modify the return value"); the method form compiles
+  silently. A public struct *field* is direct storage, so the same call
+  mutates in place - property vs field, same syntax, opposite outcome.
+- **Who hits it:** structs behind auto-properties on classes - positions,
+  sizes, money on a DTO or game entity: `transform.Position.Offset(...)`,
+  `order.Total.Add(...)`. The "why won't my struct move" classic.
+- **Repro:** a class with `Position { get; set; }` (a struct) and another
+  with a struct field; call the same mutating method through each -
+  property no-ops (X=0), field works (X=10). Deterministic, no packages.
+- **Damage:** silent no-op updates through a property while the field
+  version of the same code works - the mutation lands nowhere and nothing
+  warns, so the property is the last suspect.
+- **😈 seed:** the "fix" of adding a setter changes nothing - the getter
+  still hands out a copy; the only real fixes are making the struct
+  immutable (return a new one and assign it back) or not using a mutable
+  struct at all.
+- **Verified:** ran on .NET 10 (2026-07-24): property getter no-op (X=0),
+  struct field mutated in place (X=10).
+
+### default-struct-has-null-fields (A4,5)
+
+- **Twist:** `default(Cart)` and `new Cart[1][0]` skip the constructor, so a
+  struct that "always initializes its list" hands you a null one - and the
+  first `.Items.Add(...)` throws NullReferenceException from an object that
+  looks fully constructed.
+- **Mechanic:** `default(T)` and array allocation zero the memory and run no
+  constructor and no field initializers, so every reference field
+  (`List<T>`, `string`, a nested class) is null. The struct's own type says
+  nothing is nullable; the value simply never ran the code that would fill
+  them. This is the-skipped-initializer's sibling one rung *up* the fear
+  ladder: value fields come back 0/false (silently wrong), reference fields
+  come back null (a crash).
+- **Who hits it:** structs holding a collection or string, materialized
+  through `default`, `new T[n]`, an uninitialized field, or an `out`
+  parameter - then handed to code that trusts the constructor ran.
+- **Repro:** `struct Cart { public List<string> Items; public Cart() {
+  Items = new(); } }`; `new Cart()` works, `default(Cart).Items` is null and
+  `.Add` throws NRE, `new Cart[1][0].Items` is null too. Deterministic, no
+  packages.
+- **Damage:** NRE from a value the type system swears is constructed -
+  arising far from the `default`/array that made it, so the crash site and
+  the cause sit in different components.
+- **😈 seed:** cross-link the-skipped-initializer: same "default skips
+  construction" root, opposite fear rung - the value-field version is
+  silently wrong (a 0 multiplier), the reference-field version at least
+  crashes loudly; the quiet one is the dangerous one.
+- **Verified:** ran on .NET 10 (2026-07-24): default(Cart) and
+  new Cart[1][0] had null Items and null Name; `.Items.Add` threw NRE.
