@@ -9,7 +9,7 @@ in the "reason" column; they encode the curation bar.
 | turkish-i-login | too banal / primer-level | everyone typed a password in the wrong keyboard layout as a kid - common knowledge from the moment you touch a computer, below the museum's floor. |
 | int-overflow-in-cart | too banal / primer-level | every junior has already hit integer overflow; it's a primer, not an exhibit - people know it before they're paid to code. |
 | path-combine-betrayal | vacuum example / no who-where-how | you can't say who attacks, from where, or how - a vacuum scenario with no reproducible real-world context, so not interesting. Built and reverted at #0021 before commit. |
-| .Result deadlock | cannot reproduce honestly | needs a SynchronizationContext (UI/legacy ASP.NET); a console app can't show it. Rule: no exhibit that doesn't reproduce. |
+| .Result deadlock | cannot reproduce honestly | the *SynchronizationContext* form (UI/legacy ASP.NET) needs a captured context a console app can't show. Rule: no exhibit that doesn't reproduce. NOTE: the *thread-pool starvation* form is a different mechanic (no context, deterministic via a pinned pool) and shipped as #0035 the-pool-that-ate-itself - this row bans only the SyncContext variant. |
 | StringBuilder-in-a-loop | proven only by timing | "trust me it's slow" is banned; timings flicker across machines. |
 | quadratic ElementAt | proven only by timing | same. |
 | culture/timezone bug w/o pinning | CI would lie | if the code doesn't pin culture/zone, the demo's outcome depends on the runner. Only ship if the code fixes the environment explicitly. |
