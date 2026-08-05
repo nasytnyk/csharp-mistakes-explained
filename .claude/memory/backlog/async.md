@@ -56,29 +56,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): nested WaitAsync timed out
   while the permit was held.
 
-### the-double-wrapped-task (A4,1)
-
-- **Twist:** Task.Factory.StartNew with an async lambda returns
-  Task&lt;Task&gt;: awaiting it waits for the work to *start*, not finish -
-  the await completes instantly, the work is unfinished, the exceptions are
-  nobody's.
-- **Mechanic:** StartNew knows nothing about async delegates: it runs the
-  lambda, and an async lambda "returns" at its first await - handing back
-  the real Task as a *result*. Awaiting the outer shell observes only "the
-  lambda started". `Task.Run` exists precisely because of this: it unwraps
-  automatically. One method name apart, opposite meaning.
-- **Who hits it:** code cargo-culting StartNew "because it takes options",
-  or predating Task.Run; someone adds `async` to the lambda during a
-  refactor and every await of the result quietly stops meaning anything.
-- **Repro:** `Task.Factory.StartNew(async () => { await gate; flag = true; })`;
-  await the outer - flag is still false; only `Unwrap()`/awaiting the inner
-  task observes the real work. Gate makes it deterministic, no packages.
-- **Damage:** "completed" batches with zero work done and inner-task
-  exceptions unobserved - the same lie as exhibit #0031
-  (parallel-foreach-swallows-async) wearing a more respectable API.
-- **Verified:** ran on .NET 10 (2026-07-22): outer task completed with the
-  work provably not done.
-
 ### the-hijacked-completion (A6,5)
 
 - **Twist:** TaskCompletionSource.SetResult is not a notification - it
