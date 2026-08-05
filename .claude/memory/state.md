@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **41** | Halls: **19** | Next free id: **0042**
-- Last updated after: #0041 (2026-08-05) - unbox-must-match-exact-type (opened the Boxing hall)
+- Exhibits: **42** | Halls: **19** | Next free id: **0043**
+- Last updated after: #0042 (2026-08-05) - boxed-values-are-equal-not-same
 
 ## Exhibits shipped
 
@@ -50,6 +50,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0039 | memory | the-stack-that-only-grows | 6 |
 | 0040 | memory | the-span-left-behind | 3 |
 | 0041 | boxing | unbox-must-match-exact-type | 4,5 |
+| 0042 | boxing | boxed-values-are-equal-not-same | 2,4 |
 
 ## Halls
 

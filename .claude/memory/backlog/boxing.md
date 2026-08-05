@@ -3,41 +3,6 @@
 > Status: **opened** (2026-08-05, by #0041 unbox-must-match-exact-type). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### boxed-values-are-equal-not-same (A2,4)
-
-- **Twist:** box the same 5 twice: Equals says equal, `==` says
-  different - object-typed `==` is reference comparison and every boxing
-  mints a fresh heap object, so change detection over object-typed
-  storage reports "changed" for identical values, forever.
-- **Mechanic:** between object operands `==` compiles to reference
-  equality - no operator lookup, no value semantics. And .NET interns no
-  boxes: bools, zero, enum values, even the same variable boxed twice all
-  produce distinct objects (verified - unlike Java's small-integer
-  cache). So the same pair of values answers differently to Equals and
-  `==` depending on nothing but static types.
-- **Who hits it:** object-typed storage layers - settings bags, view
-  state, cache entries - and every `if (field != value)` change guard
-  written against object-typed fields: each assignment of an equal value
-  registers as a change, so events cascade, caches invalidate, and dirty
-  flags never clear.
-- **Repro:** two boxes of 5: Equals true, `==` false, ReferenceEquals
-  false; cache probes for bool/0/enum/same-variable all false; the
-  change-detection guard firing on an identical value. BUILDER NOTE:
-  analyzer CA2013 flags ReferenceEquals with value-type arguments - box
-  into object locals first so the build stays warning-free.
-  Deterministic, no packages.
-- **Damage:** permanently "dirty" state: update pipelines and re-renders
-  run on every touch with identical data, and the log's
-  "value changed: 5 -> 5" line is the whole bug report.
-- **😈 seed:** it heals and relapses with storage-type refactors: type
-  the field int and `==` becomes value comparison, type it object again
-  and the bug returns - a diff that "doesn't touch logic" toggles it, and
-  string's value-comparing `==` has trained everyone to expect the safe
-  behavior everywhere.
-- **Verified:** ran on .NET 10 (2026-07-24): Equals true / == false /
-  ReferenceEquals false; no box caching for bool, zero, enum, or the same
-  variable boxed twice; the != guard fired for an identical value.
-
 ### nullable-boxes-to-nothing (A4,5)
 
 - **Twist:** int? is a value type - and yet `(object)(int?)null == null`
