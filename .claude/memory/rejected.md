@@ -32,6 +32,11 @@ in the "reason" column; they encode the curation bar.
 | the-linked-leak | batch clear-out (curator) | "викидай всі 7" - same async sweep. (Also built once as #0038 then cancelled, "не зайшло".) Bug: an undisposed linked CTS leaks until process shutdown. |
 | asynclocal-never-flows-up | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: an AsyncLocal write inside an async method does not flow up to the caller. |
 | trywrite-drops-silently | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: Channel.Writer.TryWrite's ignored bool drops messages on a full bounded channel. |
+| use-after-return | curator's discretion (no reason) | discarded while triaging the Memory hall (he picked the-closure-that-held-everything to open it); no reason given, do not infer a pattern. Bug: writing through an ArrayPool array after Return, which re-rented it. |
+| the-oversized-rental | curator's discretion (no reason) | same Memory triage, no reason. Bug: ArrayPool.Rent returns >= requested and uncleared, so trusting .Length reads another renter's stale bytes. |
+| the-cache-that-owns-its-keys | curator's discretion (no reason) | same Memory triage, no reason. Bug: a Dictionary keyed by domain objects roots them forever; ConditionalWeakTable is the fix. |
+| large-array-born-in-gen2 | curator's discretion (no reason) | same Memory triage, no reason. Bug: >= 85KB allocations are born on the LOH/gen2 and survive gen-0 collections. |
+| finalizer-delays-gc | curator's discretion (no reason) | same Memory triage, no reason. Bug: adding a finalizer keeps an object alive an extra GC cycle. |
 
 ## Reason categories (the bar, distilled)
 

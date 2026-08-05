@@ -28,57 +28,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): shared-scope lambda kept the
   1 MB array alive, split-scope twin let it die.
 
-### use-after-return (A2,5)
-
-- **Twist:** Return an array to ArrayPool and keep writing through your old
-  reference - the pool has already handed that array to the next renter,
-  and your writes land inside their data. Use-after-free, managed edition.
-- **Mechanic:** Return transfers ownership back to the pool; the next Rent
-  from the same bucket hands out the same instance (the thread-local bucket
-  makes that immediate and deterministic). Nothing invalidates the old
-  reference: the array stays GC-alive the whole time, so no exception is
-  even *possible* - the reference is valid, only the ownership is gone, and
-  no type-system marker tracks ownership.
-- **Who hits it:** perf-conscious code adopting ArrayPool: Return in a
-  finally while a captured lambda or async continuation still holds the
-  buffer; or a double Return on a retry path.
-- **Repro:** Rent(100), Return, Rent(100): ReferenceEquals is true; write
-  through the stale reference; the new owner's buffer shows the byte.
-  Deterministic, no packages.
-- **Damage:** cross-request data bleed - one request's bytes appear inside
-  another's payload. A privacy incident, not just corruption, and there is
-  no exception at any point to anchor an investigation.
-- **😈 seed:** a double Return puts the same array into the pool twice -
-  two future renters then share one buffer while each believes it is
-  exclusively theirs.
-- **Verified:** ran on .NET 10 (2026-07-22): same instance re-rented, stale
-  write visible to the new owner.
-
-### the-oversized-rental (A5)
-
-- **Twist:** ArrayPool.Rent(100) returns 128 bytes - and they arrive still
-  warm with the previous renter's data: two contract breaks in one call,
-  both silent.
-- **Mechanic:** Rent promises *at least* the requested length, rounding up
-  to the bucket size; and it does not clear the array (clearing on Return
-  is opt-in). Code migrated from `new byte[n]` keeps trusting
-  `buffer.Length` - foreach, Array.Copy, Write(buffer, 0, buffer.Length) -
-  and now processes the tail; and the tail is not zeros, it is another
-  request's bytes.
-- **Who hits it:** any `new T[n]` -> `Rent(n)` migration where the buffer's
-  Length flows into a loop, a serializer, or a network write.
-- **Repro:** Rent(100).Length == 128; plant a sentinel byte, Return without
-  clearing, Rent again: the sentinel is still there for the "new" buffer.
-  Deterministic, no packages.
-- **Damage:** payloads padded with stale bytes from other requests go over
-  the wire - corrupt at best, a data leak at worst; hashes computed over
-  Length stop matching anything.
-- **😈 seed:** `Return(buffer, clearArray: true)` exists and almost nobody
-  passes it - safety is opt-in, silence is the default (the encoding
-  exhibits' recurring moral).
-- **Verified:** ran on .NET 10 (2026-07-22): 128 bytes for Rent(100), the
-  previous renter's sentinel visible.
-
 ### the-span-left-behind (A3)
 
 - **Twist:** CollectionsMarshal.AsSpan hands you the list's buffer - then
@@ -103,32 +52,6 @@
   of the data.
 - **Verified:** ran on .NET 10 (2026-07-22): write through the span
   invisible to the grown list.
-
-### the-cache-that-owns-its-keys (A6)
-
-- **Twist:** A Dictionary that attaches metadata to objects owns those
-  objects forever - "I only stored notes *about* the entity", and every
-  annotated entity just became immortal.
-- **Mechanic:** dictionary keys are strong references: as long as the
-  annotation store lives (and static caches live forever), every key object
-  is rooted, plus everything it references. The entity's logical lifetime
-  ends; its memory never does. ConditionalWeakTable exists precisely for
-  attach-metadata scenarios - its entries die with their keys.
-- **Who hits it:** static annotation/metadata/lookup stores keyed by domain
-  objects - "remember validation state for this entity" - a shape that
-  reads as caching and behaves as a leak.
-- **Repro:** a helper annotates a fresh object in a `Dictionary<object,
-  string>` and returns only a WeakReference: after forced GC it is alive;
-  the identical helper over a ConditionalWeakTable: collected. Both
-  branches in one run, deterministic, no packages.
-- **Damage:** memory grows with every entity ever annotated; the "cache"
-  retains the full object graphs of dead requests - the leak is the cache
-  working exactly as written.
-- **😈 seed:** the memory profiler shows objects retained by a Dictionary -
-  which looks precisely like a healthy cache, so the leak survives the
-  investigation too.
-- **Verified:** ran on .NET 10 (2026-07-22): Dictionary key immortal, CWT
-  key collected.
 
 ### the-stack-that-only-grows (A6)
 
@@ -156,78 +79,6 @@
   already know the rule.
 - **Verified:** ran on .NET 10 (2026-07-22): process died with "Stack
   overflow." mid-loop; CA2014 fired at compile time.
-
-### large-array-born-in-gen2 (A6)
-
-- **Twist:** `new byte[100_000]` is born in generation 2 - a fresh, just-now
-  allocation the GC treats as old - so it survives the gen-0 collections that
-  reclaim everything else, and a short-lived big buffer lingers until the next
-  rare full GC.
-- **Mechanic:** allocations >= 85,000 bytes go on the Large Object Heap, which
-  is collected only during a gen-2 (full) GC. `GC.GetGeneration` reports 2 for
-  the large array and 0 for a small one at the same age. So a dead large array
-  is *not* freed by the frequent gen-0/gen-1 collections; only a full GC
-  reclaims it - the opposite of the "allocate, drop, it's gone" intuition that
-  holds for small objects.
-- **Who hits it:** short-lived large buffers churned in a request/loop - image
-  and file byte[], large `List`/`StringBuilder` backing stores, big
-  serialization buffers - allocated and discarded fast, expecting gen-0 to
-  sweep them; instead they pile up between full GCs (and the LOH is not
-  compacted by default, so the space fragments).
-- **Repro:** `GC.GetGeneration(new byte[100_000])` is 2, `new byte[1_000]` is
-  0; weak-ref both from a NoInlining helper, drop the strong refs,
-  `GC.Collect(0)` - the small one is dead, the large one is still alive;
-  a full `GC.Collect()` finally frees it. Deterministic, no packages.
-- **Damage:** memory that the profiler shows "leaking" between full GCs even
-  though every large buffer is dead - allocation rate looks fine, working set
-  climbs, and the "leak" vanishes each time a full GC happens, so it reads as
-  a phantom.
-- **😈 seed:** the size threshold is invisible in code - one row wider, one
-  field longer, and a buffer that lived in gen 0 for years silently crosses
-  85,000 bytes into the LOH, changing its GC lifetime with no code change at
-  the allocation site.
-- **Verified:** ran on .NET 10 (2026-07-24): gen 2 vs gen 0 for the two
-  arrays; after GC.Collect(0) the small array was reclaimed and the large one
-  survived; a full GC.Collect() reclaimed it.
-
-### finalizer-delays-gc (A6)
-
-- **Twist:** giving a class a finalizer *keeps its objects alive longer*: the
-  finalizer does not run during the collection that finds the object dead - it
-  is queued and run later - so the object, and everything it references,
-  survives that GC and needs a second one to actually free.
-- **Mechanic:** an object with a finalizer is put on the finalization queue
-  when detected unreachable; the finalizer thread runs it afterwards, and only
-  a subsequent GC reclaims the memory. Proof via a finalizer flag: after the
-  first `GC.Collect()` the flag is still false (finalizer not yet run, object
-  survived); after `GC.WaitForPendingFinalizers()` it is true; a second GC
-  reclaims it. A *plain* object of the same shape is gone after the first GC.
-  BUILDER NOTE: a *short* WeakReference reports the finalizable object dead
-  immediately (it tracks root-reachability, not the queue) - use a
-  `trackResurrection: true` (long) WeakReference or the finalizer flag to
-  observe the survival honestly. NoInlining helper so the local doesn't pin it.
-- **Who hits it:** classes that add a finalizer "to be safe" (or inherit one
-  through a SafeHandle/unmanaged wrapper) and hold large managed graphs -
-  every such object costs two GC cycles and a finalizer-thread hop to reclaim,
-  and a slow finalizer backs the whole queue up.
-- **Repro:** a `~Tracked()` sets a static flag; after one `GC.Collect()` the
-  flag is false (survived), after `WaitForPendingFinalizers` true; a long
-  WeakReference is alive after the 1st GC and dead after finalize + 2nd GC,
-  while a plain object dies on the 1st. Deterministic, no packages.
-- **Damage:** memory pressure and promotion from objects that "should be
-  gone" - finalizable objects get promoted to the next generation while they
-  wait, so they live longer and collect in rarer, more expensive GCs; a
-  finalizer that blocks stalls finalization for everyone.
-- **NOTE (curator):** the two-collect + WeakReference technique also appears
-  in disposal's the-cleanup-that-never-came (which proves the *opposite* -
-  no finalizer means Dispose never runs). Same instrument, opposite lesson;
-  cross-link, keep distinct.
-- **😈 seed:** `GC.SuppressFinalize(this)` in Dispose exists precisely to undo
-  this cost - so forgetting it in a Dispose pattern silently keeps the
-  two-GC penalty even for objects you disposed promptly.
-- **Verified:** ran on .NET 10 (2026-07-24): finalizer flag false after the
-  1st GC and true after WaitForPendingFinalizers; long WeakReference alive
-  after 1st GC, dead after finalize + 2nd GC; plain object dead after 1st GC.
 
 ## Seeds
 
