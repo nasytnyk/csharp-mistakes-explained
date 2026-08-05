@@ -108,32 +108,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): call-site throw vs faulted
   task, exactly as described.
 
-### the-linked-leak (A6)
-
-- **Twist:** CreateLinkedTokenSource hooks your per-request token to the
-  app-lifetime token - forget Dispose and the app token holds that hook
-  forever: the request's object graph outlives the request, by design.
-- **Mechanic:** a linked CTS registers a callback on its parent token; that
-  registration roots the linked CTS - and everything its own registrations
-  capture - until the parent dies or the linked CTS is disposed. With a
-  process-lifetime parent (shutdown/app token), "forgot Dispose" means
-  "leaks until restart", one request at a time.
-- **Who hits it:** the per-request timeout pattern -
-  `CreateLinkedTokenSource(appStoppingToken)` + CancelAfter - dropped
-  without `using`: a famous slow-leak shape in long-running services.
-- **Repro:** a NoInlining helper creates a linked CTS over a long-lived
-  parent, registers a callback capturing a payload, returns a WeakReference
-  to the payload; forced GC: payload alive without Dispose, collected with
-  it - both branches in one run. Deterministic, no packages.
-- **Damage:** memory grows request by request through a retained path that
-  runs entirely inside framework registration lists - the profiler shows no
-  reference from user code; the "restart cures it" leak.
-- **😈 seed:** those forgotten registrations all *fire* at shutdown -
-  thousands of stale per-request callbacks executing at the worst possible
-  moment.
-- **Verified:** ran on .NET 10 (2026-07-22): payload rooted while
-  undisposed, collected once disposed.
-
 ### asynclocal-never-flows-up (A3,4)
 
 - **Twist:** the helper sets the AsyncLocal "current tenant" and returns -

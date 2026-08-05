@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **37** | Halls: **17** | Next free id: **0038**
-- Last updated after: #0037 (2026-08-05) - the-double-wrapped-task
+- Exhibits: **38** | Halls: **17** | Next free id: **0039**
+- Last updated after: #0038 (2026-08-05) - the-linked-leak
 
 ## Exhibits shipped
 
@@ -46,6 +46,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0035 | async | the-pool-that-ate-itself | 5,6 |
 | 0036 | async | the-eliminated-await | 1,5 |
 | 0037 | async | the-double-wrapped-task | 4,1 |
+| 0038 | async | the-linked-leak | 6 |
 
 ## Halls
 
