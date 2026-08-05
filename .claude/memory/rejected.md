@@ -25,6 +25,13 @@ in the "reason" column; they encode the curation bar.
 | the-cached-failure | doesn't happen in real code | his words: "і так ніхто не використає" (nobody would use it anyway). He does not see the Lazy&lt;Task&gt; / task-cache-without-failure-eviction pattern arising in real projects; his lived-experience filter overrides the textbook mechanic. |
 | threadlocal-doesnt-follow | doesn't happen in real code | his words: "теж не допустять" (they wouldn't let it happen either). In his judgment per-request state in ThreadLocal across an await does not survive real review/practice, so the bug does not occur. |
 | the-uncancellable-stream | too niche / narrow audience | his words: "мало хто пише асинк ітератори" (few people write async iterators). Real bug, but the audience that authors IAsyncEnumerable iterators is too small for the museum's everyday-accessibility bar. |
+| the-timeout-that-stopped-nothing | batch clear-out (curator) | "викидай всі 7" - cleared the whole remaining async backlog in one sweep, moving to a new hall. (Had been built once as #0036 then cancelled/reordered.) Bug: a WhenAny timeout does not cancel the abandoned work. |
+| the-self-deadlock | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: SemaphoreSlim is not reentrant, so a nested WaitAsync self-deadlocks. |
+| the-hijacked-completion | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: TaskCompletionSource.SetResult runs continuations inline on the setter's thread. |
+| the-eager-throw | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: async vs non-async Task-returning methods throw at different sites. |
+| the-linked-leak | batch clear-out (curator) | "викидай всі 7" - same async sweep. (Also built once as #0038 then cancelled, "не зайшло".) Bug: an undisposed linked CTS leaks until process shutdown. |
+| asynclocal-never-flows-up | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: an AsyncLocal write inside an async method does not flow up to the caller. |
+| trywrite-drops-silently | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: Channel.Writer.TryWrite's ignored bool drops messages on a full bounded channel. |
 
 ## Reason categories (the bar, distilled)
 
@@ -39,5 +46,6 @@ in the "reason" column; they encode the curation bar.
 9. **Topic out of scope (curator)** - a mechanic or API family the curator keeps out of the museum by preference, even when the bug is real (e.g. System.Threading.Timer). Rejects every candidate in that family, not only the named one; pre-filter the whole topic, not just the one slug.
 10. **Curator's discretion (no reason)** - he passed with no analytical objection ("просто так"). Specific to that one candidate; do not generalize to its topic or infer a taste pattern from it.
 11. **Too niche / narrow audience** - the mechanic is real and does bite, but too few developers write the code that triggers it to meet the museum's "accessible, everyday-contract" bar. Distinct from #5: it genuinely happens, just to a small audience (e.g. authoring async iterators).
+12. **Batch clear-out / hall fatigue (curator)** - he declines the remaining candidates of a hall as a group, in one sweep, with no per-item objection, and moves to a different hall. Empties the proposal queue without retiring the hall. Do not re-propose the cleared candidates; revisit only if he reopens the topic.
 
 If a new idea trips any of these, pre-filter it before proposing.
