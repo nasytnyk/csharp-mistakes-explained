@@ -74,35 +74,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): 3 awaits, 1 factory call, same
   cached exception each time.
 
-### the-eliminated-await (A1,5)
-
-- **Twist:** Delete a "redundant" await and return the task directly - the
-  using block disposes the connection before the query touches it: the
-  code-review tip that quietly breaks the method.
-- **Mechanic:** `return await task` inside a method can be shortened to
-  `return task` - a real optimization (skips one state machine) that blogs,
-  analyzers and reviewers genuinely recommend. But `using`, `try/finally`
-  and `catch` are part of the *method*: return the bare task and the method
-  exits immediately, running Dispose while the returned task is still
-  mid-flight. The awaited version kept the scope alive until the work
-  finished. The elision is only safe when nothing after the return point -
-  disposal, catch, finally - matters.
-- **Who hits it:** anyone applying the well-known "elide async/await"
-  advice; the advice is correct in plain pass-through methods and wrong
-  inside any scope, and nothing in the code marks the difference.
-- **Repro:** a helper with `using var conn = new FakeConnection()` returns
-  `QueryAsync(conn)` where QueryAsync awaits a TaskCompletionSource gate and
-  then calls `conn.Use()`; complete the gate after the helper returns -
-  ObjectDisposedException. Fully deterministic, no packages.
-- **Damage:** ObjectDisposedException at best; with resources that don't
-  guard themselves, a query against a closed/recycled handle -
-  use-after-free semantics in managed clothing.
-- **😈 seed:** the `catch` sibling: with the await elided, your catch block
-  never sees the task's exception - the method unwound long ago (pairs with
-  the-eager-throw).
-- **Verified:** ran on .NET 10 (2026-07-22): ODE from the disposed fake
-  connection, gated and deterministic.
-
 ### the-timeout-that-stopped-nothing (A1,5)
 
 - **Twist:** The classic WhenAny timeout pattern reports "timed out" and
