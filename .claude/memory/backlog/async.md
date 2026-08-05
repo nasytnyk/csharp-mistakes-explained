@@ -310,44 +310,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): CountdownEvent proof, two
   callbacks inside at once.
 
-### the-pool-that-ate-itself (A5,6)
-
-- **Twist:** One .Result "just this once" per request, and under load the
-  thread pool deadlocks itself: every thread is blocked waiting for a
-  continuation that needs a thread - the outage with zero CPU and zero
-  errors.
-- **Mechanic:** sync-over-async parks a pool thread until an async
-  continuation completes - but the continuation needs a pool thread too.
-  When blockers hold the whole pool, nothing can ever complete: a circular
-  wait through the scheduler, with no lock anywhere in the code. In real
-  services the pool is larger, so it appears only under load as a
-  mysterious stall with idle CPU.
-- **REVISIT NOTE for the curator:** `rejected.md` contains ".Result
-  deadlock", declined because the SynchronizationContext version cannot
-  reproduce in a console app. This is the *other* .Result deadlock -
-  starvation-based, no context involved - and it reproduces
-  deterministically by pinning the pool, which is the explicitly-allowed
-  "code fixes the environment" pattern. Flagged openly rather than
-  re-proposed silently; the curator judges whether the objection is
-  answered.
-- **Who hits it:** "we just need the value here" - .Result / .Wait() /
-  GetAwaiter().GetResult() in constructors, property getters, and sync
-  interface implementations over async code.
-- **Repro:** `ThreadPool.SetMinThreads(1,1)` + `SetMaxThreads(2,2)` (the
-  pin that makes at-scale behavior reproducible on two threads); two
-  Task.Run blockers each doing `Inner().GetAwaiter().GetResult()` over an
-  `await Task.Delay(100)`; `Task.WaitAll(blockers, 3s)` returns false -
-  zero progress, ever. BUILDER WARNING: this demo wrecks the pool - it
-  must be the last thing Bad.cs does. Deterministic, no packages.
-- **Damage:** total service stall under load with zero CPU, zero
-  exceptions, nothing in logs - among the hardest production incidents to
-  diagnose, and restart "fixes" it until the next traffic peak.
-- **😈 seed:** the real pool grows ~1 thread per second trying to save
-  you, so production sees slow-motion collapse instead of a clean hang -
-  which is exactly why staging never reproduces it.
-- **Verified:** ran on .NET 10 (2026-07-22): pinned pool, 3-second budget,
-  both workers wedged, no progress.
-
 ### asynclocal-never-flows-up (A3,4)
 
 - **Twist:** the helper sets the AsyncLocal "current tenant" and returns -

@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **34** | Halls: **17** | Next free id: **0035**
-- Last updated after: #0034 (2026-07-23) - virtual-call-in-constructor, by @alejandro-capel
+- Exhibits: **35** | Halls: **17** | Next free id: **0036**
+- Last updated after: #0035 (2026-08-05) - the-pool-that-ate-itself
 
 ## Exhibits shipped
 
@@ -43,6 +43,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0032 | logging | interpolated-log-loses-everything | 4 |
 | 0033 | pattern-matching | switch-expression-not-exhaustive | 5 |
 | 0034 | inheritance | virtual-call-in-constructor | 1 |
+| 0035 | async | the-pool-that-ate-itself | 5,6 |
 
 ## Halls
 
