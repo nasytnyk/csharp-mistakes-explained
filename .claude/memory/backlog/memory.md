@@ -28,33 +28,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): write through the span
   invisible to the grown list.
 
-### the-stack-that-only-grows (A6)
-
-- **Twist:** stackalloc inside a loop never frees per iteration - stack
-  memory dies at method exit, not scope exit - so the loop marches straight
-  into an uncatchable StackOverflowException.
-- **Mechanic:** stackalloc bumps the stack pointer; the language scopes the
-  *span variable*, not the memory. Each iteration allocates fresh bytes
-  below the last; nothing is reclaimed until the method returns.
-  StackOverflowException cannot be caught: the process dies. Analyzer
-  CA2014 warns about exactly this - as a warning, so the code compiles and
-  ships.
-- **Who hits it:** parsing/formatting loops adopting stackalloc for
-  per-item buffers - the natural "fast version" refactor of
-  `new byte[1024]` inside a loop.
-- **Repro:** a method looping `Span<byte> b = stackalloc byte[1024]` 200k
-  times dies with "Stack overflow." after roughly a thousand iterations
-  (1 MB default stack). The demo IS the crash - make it the whole Bad.cs,
-  nothing can run after it. Deterministic, no packages.
-- **Damage:** process death invisible to try/catch, unhandled-exception
-  hooks, and graceful shutdown - and since the fatal iteration count
-  depends on stack size, small tests pass while production batches die.
-- **😈 seed:** the fix - hoist the stackalloc above the loop - changes no
-  call site and no visible behavior: the diff is unreviewable unless you
-  already know the rule.
-- **Verified:** ran on .NET 10 (2026-07-22): process died with "Stack
-  overflow." mid-loop; CA2014 fired at compile time.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.

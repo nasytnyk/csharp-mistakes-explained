@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **38** | Halls: **18** | Next free id: **0039**
-- Last updated after: #0038 (2026-08-05) - the-closure-that-held-everything (opened the Memory hall)
+- Exhibits: **39** | Halls: **18** | Next free id: **0040**
+- Last updated after: #0039 (2026-08-05) - the-stack-that-only-grows
 
 ## Exhibits shipped
 
@@ -47,6 +47,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0036 | async | the-eliminated-await | 1,5 |
 | 0037 | async | the-double-wrapped-task | 4,1 |
 | 0038 | memory | the-closure-that-held-everything | 6 |
+| 0039 | memory | the-stack-that-only-grows | 6 |
 
 ## Halls
 
