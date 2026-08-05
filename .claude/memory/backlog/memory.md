@@ -3,30 +3,8 @@
 > Status: **opened** (2026-08-05, by #0038 the-closure-that-held-everything). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### the-span-left-behind (A3)
-
-- **Twist:** CollectionsMarshal.AsSpan hands you the list's buffer - then
-  one Add grows the list onto a new buffer, and your span keeps reading and
-  writing the abandoned one. Both sides stay perfectly happy.
-- **Mechanic:** List&lt;T&gt; grows by allocating a bigger array and
-  copying; a span taken earlier still points at the old array. The span
-  accepts writes (into garbage), the list never sees them, and unlike
-  modify-while-enumerating (#0001) no versioning guard exists on this path -
-  the span API is the "I know what I'm doing" door.
-- **Who hits it:** performance code using CollectionsMarshal spans over
-  lists while anything else may append - the aliasing silently breaks at an
-  unrelated line ("it was just one Add").
-- **Repro:** `new List<int>(4) { 1, 2, 3, 4 }`; AsSpan; Add(5) forces the
-  reallocation; `span[0] = 99`; `list[0]` is still 1 while `span[0]` reports
-  99. Deterministic, no packages.
-- **Damage:** lost writes and stale reads that begin exactly when data
-  volume crosses the capacity threshold - correct in every small test,
-  wrong at scale, and never an exception.
-- **😈 seed:** the abandoned buffer cannot be collected while the span's
-  holder lives - the "zero-allocation optimization" now retains two copies
-  of the data.
-- **Verified:** ran on .NET 10 (2026-07-22): write through the span
-  invisible to the grown list.
+> Candidate queue exhausted 2026-08-05: 3 shipped (#0038 closure, #0039 stack,
+> #0040 span), 5 rejected (see `rejected.md`). Only Seeds remain.
 
 ## Seeds
 
