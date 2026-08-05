@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **39** | Halls: **18** | Next free id: **0040**
-- Last updated after: #0039 (2026-08-05) - the-stack-that-only-grows
+- Exhibits: **40** | Halls: **18** | Next free id: **0041**
+- Last updated after: #0040 (2026-08-05) - the-span-left-behind
 
 ## Exhibits shipped
 
@@ -48,6 +48,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0037 | async | the-double-wrapped-task | 4,1 |
 | 0038 | memory | the-closure-that-held-everything | 6 |
 | 0039 | memory | the-stack-that-only-grows | 6 |
+| 0040 | memory | the-span-left-behind | 3 |
 
 ## Halls
 
