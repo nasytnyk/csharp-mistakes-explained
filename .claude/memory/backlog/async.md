@@ -3,55 +3,6 @@
 > Status: **opened**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### the-collected-timer (A6)
-
-- **Twist:** A Timer with no stored reference gets collected mid-run; the
-  "every minute" job stops with no error, no exception, no log line.
-- **Mechanic:** `System.Threading.Timer` does not root itself. If the only
-  reference is a local in the method that created it, the timer is garbage as
-  soon as that reference dies, and its callbacks simply stop after the GC
-  runs. Nothing observable fails at the moment it happens.
-- **Who hits it:** "schedule a heartbeat/cleanup in Main or a constructor and
-  ignore the return value". Survives all day on a dev machine (little GC
-  pressure), dies quietly in production.
-- **Repro:** create the timer inside a `[MethodImpl(MethodImplOptions.NoInlining)]`
-  helper and do not store the returned reference (this matters: file-based
-  `dotnet run` builds Debug, where locals stay alive to end of method - the
-  helper method's return is what frees the timer). Then `GC.Collect()` +
-  `GC.WaitForPendingFinalizers()`, wait two ticks' worth via a
-  CountdownEvent on a *stored* control timer, and show the abandoned timer's
-  counter stopped while the stored one kept counting. Forced GC keeps it
-  deterministic. No packages.
-- **Damage:** the recurring job - billing sweep, queue pump, heartbeat -
-  silently stops. Discovered days later by absence, the hardest kind of
-  evidence.
-- **Verified:** documented GC-root behavior; the forced-GC repro is standard.
-  Verify at build.
-
-### the-cached-failure (A1,5)
-
-- **Twist:** Lazy&lt;Task&gt; caches the task, not the value: one transient
-  failure and every caller after it receives the same stale exception until
-  the process restarts.
-- **Mechanic:** the Lazy factory runs once; its return value - the Task
-  *object* - is cached forever. If that task faults, the fault is now the
-  cached "value": every subsequent await observes the same exception, and the
-  factory never runs again. Identical trap with `ConcurrentDictionary<K,
-  Task<V>>` caches.
-- **Who hits it:** async caches - `Lazy<Task<Config>>`, task-per-key
-  dictionaries - the textbook "share one flight between concurrent callers"
-  pattern, minus failure eviction.
-- **Repro:** a `Lazy<Task<string>>` whose factory counts invocations and
-  throws; await it three times; the factory ran once and all three awaits got
-  the same exception. Deterministic, no packages.
-- **Damage:** a 2-second network blip at 09:00 becomes an outage lasting until
-  someone restarts the process. The dependency is healthy; your cache
-  re-serves the corpse of its one failure.
-- **😈 seed:** health checks stay green - they probe the dependency, not your
-  cache.
-- **Verified:** ran on .NET 10 (2026-07-22): 3 awaits, 1 factory call, same
-  cached exception each time.
-
 ### the-timeout-that-stopped-nothing (A1,5)
 
 - **Twist:** The classic WhenAny timeout pattern reports "timed out" and
@@ -127,34 +78,6 @@
   (parallel-foreach-swallows-async) wearing a more respectable API.
 - **Verified:** ran on .NET 10 (2026-07-22): outer task completed with the
   work provably not done.
-
-### threadlocal-doesnt-follow (A6)
-
-- **Twist:** ThreadLocal state does not follow the code across an await:
-  the method resumes on another thread and the "per-request" cache is
-  suddenly empty - or, worse, holds a different request's data.
-- **Mechanic:** in a console/server app an await captures no thread
-  affinity; the continuation runs wherever the scheduler puts it.
-  ThreadLocal and [ThreadStatic] belong to the physical thread, so the
-  async flow walks away from its own state - and the next unrelated work
-  item scheduled onto the OLD thread inherits it. AsyncLocal is the
-  flow-following twin; its own trap is `asynclocal-never-flows-up` below.
-- **Who hits it:** per-request ambient state written pre-async and still
-  running: current user, current tenant, thread-keyed caches and buffers.
-- **Repro:** BUILDER WARNING - the naive `await Task.Yield()` demo does NOT
-  guarantee a thread hop (verified live: it happily resumed on the same
-  pool thread). Deterministic technique: set the ThreadLocal on a dedicated
-  `new Thread` which starts the async method (it runs synchronously to the
-  first await, then the thread *exits*); complete the gate from the main
-  thread. The continuation cannot run on a dead thread, so the hop is
-  guaranteed, and the ThreadLocal reads its default after the await. No
-  packages.
-- **Damage:** the empty-state case is the lucky one; the unlucky one is
-  cross-request bleed - tenant A resumes on a pool thread still warm with
-  tenant B's ThreadLocal. Correctness and privacy, fully silent.
-- **Verified:** ran on .NET 10 (2026-07-22) with the dedicated-thread
-  technique; the Task.Yield version was tried and rejected by that same
-  run.
 
 ### the-hijacked-completion (A6,5)
 
@@ -259,9 +182,9 @@
 - **Damage:** requests processed under the wrong tenant or correlation
   id - the setter provably ran, so the investigation trusts it; the write
   worked everywhere except where anyone looks.
-- **COORDINATION:** threadlocal-doesnt-follow (above) is the
-  physical-thread twin and links here. Two broken models: the thread
-  doesn't follow the flow / the flow doesn't report back up.
+- **COORDINATION:** its physical-thread twin threadlocal-doesnt-follow was
+  rejected (see `rejected.md`, "doesn't happen in real code"), so this
+  AsyncLocal candidate now stands alone.
 - **😈 seed:** the workaround people find - return the value and reassign
   in the caller - dies the day one more async layer appears in between;
   the only stable pattern is writing the AsyncLocal at the top of the
@@ -269,40 +192,6 @@
 - **Verified:** ran on .NET 10 (2026-07-24): sync write persisted; async
   write visible inside, gone in the caller; sync-completing async write
   also gone.
-
-### the-uncancellable-stream (A5)
-
-- **Twist:** `await foreach (... in Stream().WithCancellation(token))`
-  reads like a cancellable loop - and the token goes precisely nowhere:
-  without an [EnumeratorCancellation] parameter on the iterator,
-  WithCancellation is a silent no-op.
-- **Mechanic:** WithCancellation hands the token to GetAsyncEnumerator;
-  the compiler-generated enumerator forwards it only into a parameter
-  marked [EnumeratorCancellation] - and the body must still consume it
-  (ThrowIfCancellationRequested or pass it to awaits). A parameterless
-  iterator discards the token with no warning and no exception: the loop
-  runs to natural completion however hard the caller cancels. (A token
-  parameter *without* the attribute at least draws CS8425; the
-  parameterless shape draws nothing at all - verified clean build.)
-- **Who hits it:** consumers of IAsyncEnumerable APIs - streaming
-  queries, event feeds, paging wrappers - adding WithCancellation for
-  shutdown or timeout and trusting the name; and library authors who
-  forget the attribute, shipping uncancellable streams to every caller.
-- **Repro:** parameterless 10-item iterator, cancel after item 2: all 10
-  items arrive, no exception. Same loop over an
-  [EnumeratorCancellation] + ThrowIfCancellationRequested iterator:
-  OperationCanceledException after 3. Deterministic, no packages.
-- **Damage:** graceful shutdown that isn't - the drain loop keeps
-  consuming a stream it "cancelled", holds the process past its deadline,
-  and gets killed hard mid-item; stream timeouts that never fire.
-- **😈 seed:** the API splits the contract so both sides are right and
-  the pair is still wrong: the caller correctly wrote WithCancellation,
-  the author correctly shipped a warning-free iterator - and the piece
-  that connects them is one attribute whose absence no call site can
-  see.
-- **Verified:** ran on .NET 10 (2026-07-24): 10 of 10 items after cancel
-  with the parameterless iterator, cancelled after 3 with the attributed
-  one.
 
 ### trywrite-drops-silently (A7,5)
 
