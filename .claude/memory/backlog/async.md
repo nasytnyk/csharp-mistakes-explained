@@ -28,28 +28,6 @@
 - **Verified:** documented GC-root behavior; the forced-GC repro is standard.
   Verify at build.
 
-### semaphore-never-released (A5)
-
-- **Twist:** An exception between Wait and Release leaks a permit forever; the
-  next caller waits on a semaphore nobody will ever free.
-- **Mechanic:** `SemaphoreSlim` has no ownership: nothing ties a permit to the
-  code that acquired it, and nothing returns it automatically. If the guarded
-  code throws and `Release()` is not in a `finally` (or the `try` starts too
-  late), the count is down by one forever. After maxCount such failures every
-  `WaitAsync` blocks indefinitely.
-- **Who hits it:** throttling - `SemaphoreSlim(4)` around "at most 4
-  concurrent calls to the payment API", with Release on the happy path only.
-- **Repro:** `SemaphoreSlim(1)`; the guarded operation throws; catch and
-  continue; the next `WaitAsync(TimeSpan.FromMilliseconds(200))` returns
-  false - the permit is provably gone. No real waiting, no packages,
-  deterministic.
-- **Damage:** capacity shrinks one failure at a time until the system stands
-  still. Logs show every original exception *handled* - the incident report
-  says "it just got slower and slower until restart".
-- **😈 seed:** the drained state outlives its cause: the flaky dependency
-  recovers in seconds, your process never does.
-- **Verified:** follows directly from SemaphoreSlim semantics; verify at build.
-
 ### the-cached-failure (A1,5)
 
 - **Twist:** Lazy&lt;Task&gt; caches the task, not the value: one transient
@@ -255,31 +233,6 @@
   moment.
 - **Verified:** ran on .NET 10 (2026-07-22): payload rooted while
   undisposed, collected once disposed.
-
-### the-overlapping-timer (A6,5)
-
-- **Twist:** System.Threading.Timer does not wait for your callback: let
-  the work outgrow the period and two invocations run concurrently - the
-  "every minute" job starts racing itself.
-- **Mechanic:** the timer fires on schedule regardless of whether the
-  previous callback returned, so a slow tick overlaps the next one: two
-  threads inside code written as if it runs once at a time. `PeriodicTimer`
-  (`await WaitForNextTickAsync` in a loop) is the modern shape that cannot
-  overlap - the axiom fix.
-- **Who hits it:** cleanup/billing/queue-pump jobs on Timer - correct for
-  years while the table was small, self-racing the week it grew.
-- **Repro:** determinism note: this one needs real ticks (short period),
-  but the assertion is structural, not a timing measurement - the first
-  callback blocks on a CountdownEvent(2) that only the second callback's
-  arrival can open, *proving* two are inside simultaneously; generous
-  timeouts bound the wait. No packages.
-- **Damage:** the billing sweep processes the same rows twice,
-  concurrently - double charges produced by the job that existed to prevent
-  them.
-- **😈 seed:** overlap compounds: each slow tick makes the database
-  slower, which makes more ticks overlap - the job DDoSes itself.
-- **Verified:** ran on .NET 10 (2026-07-22): CountdownEvent proof, two
-  callbacks inside at once.
 
 ### asynclocal-never-flows-up (A3,4)
 
