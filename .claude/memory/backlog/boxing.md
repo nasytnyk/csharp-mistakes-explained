@@ -3,26 +3,6 @@
 > Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### mutating-a-boxed-struct (A3)
-
-- **Twist:** Call a mutating method on a struct through an interface and the
-  box mutates - your variable never changes, and each new cast makes a fresh
-  box, so the mutation isn't even *somewhere*: it's nowhere.
-- **Mechanic:** casting a struct to an interface copies it into a heap box;
-  interface dispatch mutates the box. Cast again - new box, old state. The
-  variable on the stack is never touched.
-- **Who hits it:** structs stored as interfaces: `List<IShape>`,
-  `IEnumerator` implementations (the classic), method parameters typed as
-  the interface.
-- **Repro:** counter struct implementing IIncrement; increment through the
-  interface-typed reference and through the variable; print the divergence,
-  then show two casts producing independent boxes. Deterministic, no
-  packages.
-- **Damage:** state machines that never advance, counters stuck at zero -
-  and the same code with a class works, pointing suspicion anywhere but the
-  cast.
-- **Verified:** CLR boxing semantics; verify at build.
-
 ### unbox-must-match-exact-type (A4,5)
 
 - **Twist:** `42L == 42` is true and every implicit conversion in the
@@ -128,35 +108,6 @@
   reference, filled boxed as Int32; HasValue worked while GetType() threw
   NRE; the settings-bag (int) cast threw NRE; a plain box unboxed into
   int? cleanly.
-
-### ternary-unifies-then-boxes (A4,5)
-
-- **Twist:** `object x = useInt ? 5 : 3.14;` is a `double` even when `useInt`
-  is true - the conditional expression unifies both arms to one compile-time
-  type, so the box captures `5.0`, not `5`; `x is int` is false and `case 5`
-  misses.
-- **Mechanic:** a `?:` expression has a single type computed from both arms
-  at compile time (here `int` and `double` unify to `double`); the runtime
-  branch does not change it. Assigning to `object` boxes that unified type,
-  so a true branch that "returns an int" actually boxes a double. Same trap
-  with `int`/`long` (unifies to `long`), `int`/`decimal`, etc. Nothing warns.
-- **Who hits it:** building an `object`-typed value with a ternary - a
-  parameter bag, a `Dictionary<string,object>`, a params array, a
-  serializer input - where one arm is a whole number and the other is
-  fractional or wider.
-- **Repro:** `object r = useInt ? 5 : 3.14;` prints type Double, `r is int`
-  false, a `case 5` switch falls to default; `useInt ? 1 : 2L` boxes Int64.
-  Deterministic, no packages.
-- **Damage:** downstream `is int` / `case int` / unbox to int silently miss
-  or throw for a value that "is obviously 5" - the dispatcher takes the
-  default branch, or `(int)r` throws (see unbox-must-match-exact-type),
-  keyed to a fractional arm the true path never touched.
-- **😈 seed:** the fix people try - casting the fractional arm, `useInt ? 5
-  : (int)3.14` - "works" by truncating 3.14 to 3, silently corrupting the
-  other branch to make the type line up; the real fix is boxing each arm
-  explicitly (`(object)5 : (object)3.14`).
-- **Verified:** ran on .NET 10 (2026-07-24): `useInt ? 5 : 3.14` boxed as
-  Double, `is int` false, switch missed; `1 : 2L` boxed as Int64.
 
 ### boxed-enum-isnt-its-number (A4,5)
 
