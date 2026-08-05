@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **40** | Halls: **18** | Next free id: **0041**
-- Last updated after: #0040 (2026-08-05) - the-span-left-behind
+- Exhibits: **41** | Halls: **19** | Next free id: **0042**
+- Last updated after: #0041 (2026-08-05) - unbox-must-match-exact-type (opened the Boxing hall)
 
 ## Exhibits shipped
 
@@ -49,13 +49,15 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0038 | memory | the-closure-that-held-everything | 6 |
 | 0039 | memory | the-stack-that-only-grows | 6 |
 | 0040 | memory | the-span-left-behind | 3 |
+| 0041 | boxing | unbox-must-match-exact-type | 4,5 |
 
 ## Halls
 
-**18 opened, 11 planned** (29 total). Full registry (slugs, emoji, status) is in
+**19 opened, 10 planned** (29 total). Full registry (slugs, emoji, status) is in
 `halls.md` - taxonomy expanded to ~30 on 2026-07-19; `regex` retired at hall
-level 2026-07-24 (see `rejected.md`); Memory opened 2026-08-05 by #0038. Async
-backlog cleared 2026-08-05 (see `rejected.md`); planned halls remain stocked.
+level 2026-07-24 (see `rejected.md`); Memory opened 2026-08-05 by #0038, Boxing
+by #0041. Async + Memory backlogs cleared 2026-08-05 (see `rejected.md`); other
+planned halls remain stocked.
 
 ## Infra status
 

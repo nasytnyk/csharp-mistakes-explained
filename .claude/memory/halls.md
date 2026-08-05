@@ -32,6 +32,7 @@ per hall. New halls: add a row here first.
 | logging | 🪵 | Logging |
 | inheritance | 🪆 | Inheritance |
 | memory | 💾 | Memory |
+| boxing | 🥊 | Boxing |
 
 ## Planned - language mechanics
 
@@ -45,7 +46,6 @@ per hall. New halls: add a row here first.
 
 | slug | emoji | front-page name |
 |------|:--:|---|
-| boxing | 🥊 | Boxing |
 | reflection | 🪞 | Reflection |
 
 ## Planned - ecosystem

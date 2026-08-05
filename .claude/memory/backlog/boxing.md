@@ -1,42 +1,7 @@
 # 🥊 boxing
 
-> Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
+> Status: **opened** (2026-08-05, by #0041 unbox-must-match-exact-type). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
-
-### unbox-must-match-exact-type (A4,5)
-
-- **Twist:** `42L == 42` is true and every implicit conversion in the
-  language agrees an int fits in a long - yet `(int)(object)42L` throws
-  InvalidCastException: unboxing demands the exact type. And the one place
-  the rule bends - enums - trains you to expect leniency exactly where
-  there is none.
-- **Mechanic:** unboxing checks the box's runtime type against the target;
-  no numeric conversions apply. `(int)` from a long box, `(decimal)` from
-  a double box, `(int)` from a byte box, `(uint)` from an int box - all
-  throw. The two-step `(int)(long)o` works: unbox exactly, then convert.
-  The documented exception: enum boxes unbox to their underlying type and
-  vice versa - `(int)(object)DayOfWeek.Monday` and `(DayOfWeek)(object)1`
-  both succeed.
-- **Who hits it:** object-typed data at borders - ADO.NET readers (SQLite
-  hands INTEGER columns over as long), Excel/COM interop (every number is
-  a double), DataTable cells, deserialized payloads.
-  `(int)reader["Count"]` works against one provider and throws against
-  the next.
-- **Repro:** one boxed 42L: `(int)` throws, `(int)(long)` works; boxed 1.1
-  vs `(decimal)` throws; boxed (byte)5 vs `(int)` throws; both enum
-  directions succeed; `(uint)(object)42` throws. Deterministic, no
-  packages.
-- **Damage:** a crash keyed to the data *source*, not the code: the same
-  line works in dev against SQL Server's int and dies in prod against
-  SQLite's long - provider migrations and test-vs-prod database
-  differences detonate a cast that reviewed as obviously safe.
-- **😈 seed:** pattern-matching's boxed-five-is-not-five is this same box
-  with the opposite failure mode - `is 5` misses *silently* where the
-  cast throws loudly. "Modernizing" the cast into a pattern match trades
-  the crash for wrong routing, one rung down the fear ladder. Cross-hall
-  pair - keep the two exhibits coordinated.
-- **Verified:** ran on .NET 10 (2026-07-24): long/double/byte/uint casts
-  all threw, two-step worked, both enum directions worked.
 
 ### boxed-values-are-equal-not-same (A2,4)
 
