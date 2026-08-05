@@ -31,6 +31,7 @@ per hall. New halls: add a row here first.
 | pattern-matching | 🧩 | Pattern Matching |
 | logging | 🪵 | Logging |
 | inheritance | 🪆 | Inheritance |
+| memory | 💾 | Memory |
 
 ## Planned - language mechanics
 
@@ -46,7 +47,6 @@ per hall. New halls: add a row here first.
 |------|:--:|---|
 | boxing | 🥊 | Boxing |
 | reflection | 🪞 | Reflection |
-| memory | 💾 | Memory |
 
 ## Planned - ecosystem
 
