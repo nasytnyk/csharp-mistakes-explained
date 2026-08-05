@@ -1,32 +1,7 @@
 # 💾 memory
 
-> Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
+> Status: **opened** (2026-08-05, by #0038 the-closure-that-held-everything). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
-
-### the-closure-that-held-everything (A6)
-
-- **Twist:** A lambda that captured one small int keeps a 100 MB array alive
-  - because the compiler put every captured variable of the scope into one
-  shared closure object, and your little callback owns all of it.
-- **Mechanic:** the compiler generates one display class per scope; all
-  variables captured by *any* lambda in that scope live on it. A long-lived
-  delegate that captured only `retryCount` also roots the giant buffer a
-  neighboring lambda captured. Restructuring the scopes (or copying to
-  locals in a nested block) breaks the tie.
-- **Who hits it:** event handlers and callbacks registered inside methods
-  that also touched large data - upload handlers, report generators.
-- **Repro:** BUILDER DETAIL: the scope needs a second lambda that touches
-  the big array (even one that is created and immediately dropped) - that
-  is what forces the array into the shared display class; the kept "small"
-  lambda then roots it. WeakReference to the big array; keep only the small
-  lambda; forced GC: alive. Same code with the scopes split (big used
-  without any lambda capturing it): collected. Both branches in one run,
-  deterministic, no packages.
-- **Damage:** memory leaks with no reference to the big object anywhere in
-  user code - the retained path exists only in compiler-generated classes,
-  where nobody looks.
-- **Verified:** ran on .NET 10 (2026-07-22): shared-scope lambda kept the
-  1 MB array alive, split-scope twin let it die.
 
 ### the-span-left-behind (A3)
 

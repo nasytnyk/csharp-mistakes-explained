@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **37** | Halls: **17** | Next free id: **0038**
-- Last updated after: #0037 (2026-08-05) - the-double-wrapped-task
+- Exhibits: **38** | Halls: **18** | Next free id: **0039**
+- Last updated after: #0038 (2026-08-05) - the-closure-that-held-everything (opened the Memory hall)
 
 ## Exhibits shipped
 
@@ -46,13 +46,14 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0035 | async | the-pool-that-ate-itself | 5,6 |
 | 0036 | async | the-eliminated-await | 1,5 |
 | 0037 | async | the-double-wrapped-task | 4,1 |
+| 0038 | memory | the-closure-that-held-everything | 6 |
 
 ## Halls
 
-**17 opened, 16 planned** (33 total). Full registry (slugs, emoji, status) is in
+**18 opened, 11 planned** (29 total). Full registry (slugs, emoji, status) is in
 `halls.md` - taxonomy expanded to ~30 on 2026-07-19; `regex` retired at hall
-level 2026-07-24 (see `rejected.md`). Every planned hall is stocked with
-verified candidates in `backlog/`.
+level 2026-07-24 (see `rejected.md`); Memory opened 2026-08-05 by #0038. Async
+backlog cleared 2026-08-05 (see `rejected.md`); planned halls remain stocked.
 
 ## Infra status
 
