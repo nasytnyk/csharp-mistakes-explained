@@ -103,33 +103,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): ODE from the disposed fake
   connection, gated and deterministic.
 
-### the-timeout-that-stopped-nothing (A1,5)
-
-- **Twist:** The classic WhenAny timeout pattern reports "timed out" and
-  walks away - the abandoned work keeps running, its charge lands a second
-  later, and its exception has no one left to crash.
-- **Mechanic:** `Task.WhenAny(work, Task.Delay(t))` completes when the
-  first task does; the loser is not cancelled - nothing even tries to stop
-  it. The caller logs a timeout and usually retries, while the original
-  work finishes anyway (double side effect) or faults (unobserved
-  exception). "Timeout" in this pattern means "I stopped watching", not
-  "it stopped happening".
-- **Who hits it:** the standard timeout idiom around payments, HTTP calls,
-  and "if it takes more than 5s, retry" logic - one of the most-pasted
-  async snippets in existence.
-- **Repro:** gate the work with a TaskCompletionSource; let
-  Task.CompletedTask play the Delay that already expired; WhenAny declares
-  timeout while the side-effect counter is 0; open the gate - the counter
-  hits 1 *after* "timed out" was reported. Deterministic, no packages.
-- **Damage:** retry-after-timeout doubles the charge: the "timed out"
-  operation succeeded too, so reconciliation finds one order paid twice -
-  silent money damage from a snippet everyone trusts.
-- **😈 seed:** the loser's exception surfaces minutes later as
-  TaskScheduler.UnobservedTaskException - a crash report pointing at
-  nothing (cross-link #0019, #0021).
-- **Verified:** ran on .NET 10 (2026-07-22): charge landed after the
-  timeout verdict was already printed.
-
 ### the-self-deadlock (A4)
 
 - **Twist:** SemaphoreSlim is the async replacement for lock - minus
