@@ -39,6 +39,7 @@ in the "reason" column; they encode the curation bar.
 | finalizer-delays-gc | curator's discretion (no reason) | same Memory triage, no reason. Bug: adding a finalizer keeps an object alive an extra GC cycle. |
 | mutating-a-boxed-struct | curator's discretion (no reason) | discarded while triaging the Boxing hall (he took unbox-must-match-exact-type, boxed-values-are-equal-not-same, nullable-boxes-to-nothing, boxed-enum-isnt-its-number); no reason given. Bug: mutating a struct through an interface mutates the box, not your variable. |
 | ternary-unifies-then-boxes | curator's discretion (no reason) | same Boxing triage, no reason. Bug: `object x = c ? 5 : 3.14` boxes the arms' unified compile-time type (double), so `x is int` is false even when the int arm ran. |
+| boxed-enum-isnt-its-number | curator's discretion (no reason) | "відхиляй цей, не сподобався" - built as #0044 and verified, but on PR review he didn't like it; PR #18 closed, not merged. Taste call, no analytical reason. Bug: a boxed enum is not Equal to a boxed int (dictionary/Equals miss) though the (int) cast bridges them. |
 
 ## Reason categories (the bar, distilled)
 
