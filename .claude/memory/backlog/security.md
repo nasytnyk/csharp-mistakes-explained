@@ -134,29 +134,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): under tr-TR, `"admin".ToUpper()`
   did not equal `"ADMIN"` while `ToUpperInvariant` did.
 
-### guessable-random (A6)
-
-- **Twist:** `Random` for password-reset tokens: same seed, same "random"
-  token - and the seed is guessable, so the attacker doesn't break your
-  crypto, they just run your line of code.
-- **Mechanic:** System.Random is a deterministic PRNG: the seed fully
-  determines the sequence, and its state is recoverable from observed
-  outputs. The legacy pattern `new Random(someTimeValue)` narrows the seed
-  to a searchable window. RandomNumberGenerator is the unpredictable one -
-  the class name is the entire fix.
-- **Who hits it:** reset tokens, invite codes, temporary passwords, CSRF-ish
-  nonces built with `Random` because it was already imported.
-- **Repro:** two `new Random(seed)` with the same seed generate identical
-  "tokens" - frame one as the server, one as the attacker who guessed the
-  seed. Deterministic by construction, no packages. (Do not claim
-  parameterless `new Random()` is time-seeded on modern .NET - it isn't;
-  the exhibit is about Random being deterministic and non-cryptographic,
-  and about the legacy explicit-seed pattern.)
-- **Damage:** account takeover via predicted reset token - maximal stakes,
-  minimal code.
-- **Verified:** PRNG determinism by definition; the honesty note about
-  modern seeding recorded so the README doesn't overclaim. Verify at build.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
