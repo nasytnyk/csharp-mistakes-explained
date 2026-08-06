@@ -3,41 +3,6 @@
 > Status: **opened** (2026-08-05, by #0046 null-forgiving-lies). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### the-smuggled-null (A5,6)
-
-- **Twist:** one JSON payload with `"CustomerId": null` writes null straight
-  into a non-nullable, even initialized, property - annotations exist only
-  at compile time, the deserializer never reads them, and the NRE fires far
-  downstream.
-- **Mechanic:** NRT is erased at runtime and System.Text.Json ignores it by
-  default: an explicit JSON null overwrites a non-nullable property (even
-  one with an initializer), and a missing member bound through a positional
-  record constructor passes default = null silently. `required` guards
-  *presence* only - a missing required member throws JsonException, but an
-  explicit null still lands. The real fix is
-  `JsonSerializerOptions.RespectNullableAnnotations` (.NET 9+), which turns
-  the annotation into an actual runtime check.
-- **Who hits it:** every API endpoint and message consumer - JS clients
-  serialize undefined as null routinely, and version skew drops members;
-  the DTO says non-null, the wire disagrees.
-- **Repro:** deserialize `{"CustomerId": null}` into a class DTO and `{}`
-  into a positional record; print both nulls, then dereference. BUILDER
-  WARNING: do not null-probe the property before the final dereference -
-  an `is null` probe teaches flow analysis the property can be null and
-  CS8602 appears; keep Bad.cs's dereference clean so the build stays
-  warning-free. `#:property PublishAot=false`.
-- **Damage:** NRE hours later, far from the boundary - or worse, the
-  "impossible" null is saved onward into the database and every consumer
-  inherits the type system's forbidden state.
-- **😈 seed:** `required` - the fix everyone reaches for - closes only the
-  missing-member door: `{"CustomerId": null}` sails through `required` and
-  lands anyway.
-- **Verified:** ran on .NET 10 (2026-07-22): explicit null overwrote the
-  initialized property; record ctor bound null for a missing member;
-  required threw for missing but accepted explicit null; the dereference
-  compiled warning-free and threw NRE; RespectNullableAnnotations made the
-  same payload throw JsonException instead.
-
 ### the-stale-narrowing (A1,5)
 
 - **Twist:** `if (_user != null)` narrows the field, the helper call on the
