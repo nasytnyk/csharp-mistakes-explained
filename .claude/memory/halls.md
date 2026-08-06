@@ -35,6 +35,7 @@ per hall. New halls: add a row here first.
 | boxing | 🥊 | Boxing |
 | generics | 🧬 | Generics |
 | nullability | 🕳️ | Nullability |
+| security | 🔒 | Security |
 
 ## Planned - language mechanics
 
@@ -57,12 +58,11 @@ per hall. New halls: add a row here first.
 | testing | 🧪 | Testing |
 | io | 📁 | IO & Files |
 
-## Planned - strings & security
+## Planned - strings
 
 | slug | emoji | front-page name |
 |------|:--:|---|
 | strings | 🧵 | Strings |
-| security | 🔒 | Security |
 
 > `strings-memory` is retired in favor of splitting into `strings`
 > (culture, encoding, grapheme) and `memory` (allocation, Span, GC) - two
