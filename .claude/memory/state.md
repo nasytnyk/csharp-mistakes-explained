@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **44** | Halls: **20** | Next free id: **0045**
-- Last updated after: #0044 (2026-08-05) - variance-skips-value-types (opened the Generics hall)
+- Exhibits: **45** | Halls: **20** | Next free id: **0046**
+- Last updated after: #0045 (2026-08-05) - sort-compiles-for-anything
 
 ## Exhibits shipped
 
@@ -53,6 +53,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0042 | boxing | boxed-values-are-equal-not-same | 2,4 |
 | 0043 | boxing | nullable-boxes-to-nothing | 4,5 |
 | 0044 | generics | variance-skips-value-types | 4,5 |
+| 0045 | generics | sort-compiles-for-anything | 5 |
 
 ## Halls
 
