@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **46** | Halls: **21** | Next free id: **0047**
-- Last updated after: #0046 (2026-08-05) - null-forgiving-lies (opened the Nullability hall)
+- Exhibits: **47** | Halls: **21** | Next free id: **0048**
+- Last updated after: #0047 (2026-08-05) - the-smuggled-null
 
 ## Exhibits shipped
 
@@ -55,6 +55,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0044 | generics | variance-skips-value-types | 4,5 |
 | 0045 | generics | sort-compiles-for-anything | 5 |
 | 0046 | nullability | null-forgiving-lies | 5 |
+| 0047 | nullability | the-smuggled-null | 5,6 |
 
 ## Halls
 
