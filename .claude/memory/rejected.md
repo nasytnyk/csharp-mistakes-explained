@@ -44,6 +44,7 @@ in the "reason" column; they encode the curation bar.
 | t-question-mark-is-not-nullable | curator's discretion (no reason) | same Generics triage, no reason. Bug: unconstrained `T?` is an annotation, not Nullable<T>, so `T? Find<T>()` returns 0 (not null) for T=int and null-guards pass it through. |
 | the-oblivious-boundary | too niche / narrow audience | his words: "сильно специфічно" (too specific). Discarded while triaging Nullability (he took null-forgiving-lies, the-smuggled-null, the-stale-narrowing). Bug: a nullable-enabled caller dereferences a `#nullable disable`/un-annotated helper's null with zero warnings, then NREs. |
 | the-stale-narrowing | too banal / primer-level | "якось банально" (somehow banal) - built as #0048 and verified, but he found it trite on PR review; PR #23 closed, not merged. Bug: nullable flow analysis keeps a field's null-check narrowing across a method call that nulls the field, so warning-free code NREs. |
+| interpolated-injection | premise doesn't hold | verified on .NET 10 while prototyping the Security hall: EF Core flags BOTH natural forms of a dynamic FromSqlRaw - EF1002 for an interpolated string, EF1003 for a concatenated one - so the candidate's "silent, compiler happily allows both, one method name apart with no warning" premise is false. The injection is real (3 rows vs 1) but not silent; EF warns. Offered the honest reframe (warnings ship because warning != error); curator declined it and had me open Security with guessable-random instead. |
 
 ## Reason categories (the bar, distilled)
 

@@ -134,25 +134,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): under tr-TR, `"admin".ToUpper()`
   did not equal `"ADMIN"` while `ToUpperInvariant` did.
 
-### interpolated-injection (A4)
-
-- **Twist:** The same `$"...{name}..."` is parameterized SQL in
-  FromSqlInterpolated and an injection in FromSqlRaw - identical syntax,
-  opposite fate, and the compiler happily allows both.
-- **Mechanic:** FromSqlInterpolated receives FormattableString and turns
-  each hole into a DbParameter; FromSqlRaw receives the already-formatted
-  string, holes pre-concatenated. An interpolated string converts to string
-  implicitly, so passing it to the Raw overload compiles without a hint.
-- **Who hits it:** EF Core raw-SQL users; reviewers cannot tell safe from
-  unsafe without reading the method name, which is exactly one word
-  different.
-- **Repro:** SQLite EF setup as #0008; a name input of `' OR '1'='1` -
-  Interpolated returns one row, Raw returns the whole table. Deterministic,
-  self-contained database.
-- **Damage:** SQL injection - the museum's clearest security stakes, and the
-  Bad/Good diff is a single method name.
-- **Verified:** documented EF API design; verify at build with #0008 setup.
-
 ### guessable-random (A6)
 
 - **Twist:** `Random` for password-reset tokens: same seed, same "random"
