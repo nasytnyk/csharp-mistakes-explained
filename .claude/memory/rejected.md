@@ -43,6 +43,7 @@ in the "reason" column; they encode the curation bar.
 | static-field-per-closed-type | curator's discretion (no reason) | discarded while triaging the Generics hall (he took variance-skips-value-types, sort-compiles-for-anything); no reason. Bug: a static field in a generic type is one field per closed type (Cache<int> vs Cache<string>), so a "global" counter/cache silently shards by T. |
 | t-question-mark-is-not-nullable | curator's discretion (no reason) | same Generics triage, no reason. Bug: unconstrained `T?` is an annotation, not Nullable<T>, so `T? Find<T>()` returns 0 (not null) for T=int and null-guards pass it through. |
 | the-oblivious-boundary | too niche / narrow audience | his words: "сильно специфічно" (too specific). Discarded while triaging Nullability (he took null-forgiving-lies, the-smuggled-null, the-stale-narrowing). Bug: a nullable-enabled caller dereferences a `#nullable disable`/un-annotated helper's null with zero warnings, then NREs. |
+| the-stale-narrowing | too banal / primer-level | "якось банально" (somehow banal) - built as #0048 and verified, but he found it trite on PR review; PR #23 closed, not merged. Bug: nullable flow analysis keeps a field's null-check narrowing across a method call that nulls the field, so warning-free code NREs. |
 
 ## Reason categories (the bar, distilled)
 
