@@ -27,7 +27,7 @@ and the mechanic behind it.
 - [0018](src/async/0018-tasks-are-not-results/) never mistake a collection of **tasks** for a collection of **results**
 - [0019](src/async/0019-forgotten-task/) never **drop a Task** - await it or hand it to someone who will
 - [0021](src/async/0021-whenall-hides-exceptions/) never trust `await Task.WhenAll` to report **more than one failure**
-- [0031](src/async/0031-parallel-foreach-swallows-async/) never hand an **async** lambda to `Parallel.ForEach` (@nasytnyk)
+- [0031](src/async/0031-parallel-foreach-swallows-async/) never hand an **async** lambda to `Parallel.ForEach` (@palkotnyk)
 - [0035](src/async/0035-the-pool-that-ate-itself/) never block on **async** code with `.Result` or `.Wait()`
 - [0036](src/async/0036-the-eliminated-await/) never elide `await` inside a **using** or try/finally block
 - [0037](src/async/0037-the-double-wrapped-task/) never launch an **async** lambda with `Task.Factory.StartNew` - use `Task.Run`
