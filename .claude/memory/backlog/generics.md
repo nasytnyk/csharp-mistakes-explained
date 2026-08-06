@@ -3,60 +3,6 @@
 > Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
 
-### static-field-per-closed-type (A6)
-
-- **Twist:** A static field in `Cache<T>` is not one field - it is one field
-  *per T*, and the "global" cache silently shards itself by type argument.
-- **Mechanic:** statics live on the closed constructed type: `Cache<int>` and
-  `Cache<string>` each get their own copy. A limit, pool, or registry in a
-  generic base class multiplies invisibly.
-- **Who hits it:** generic base classes with static counters/caches/config -
-  `Repository<T>.ConnectionCount` - where the author meant one number for
-  the process.
-- **Repro:** increment the "shared" static through two type arguments; print
-  both copies diverging. Deterministic, no packages.
-- **Damage:** connection limits that don't limit, singletons that aren't
-  single, caches that miss because the entry went into a sibling.
-- **Verified:** CLR-specified behavior; verify at build.
-
-### t-question-mark-is-not-nullable (A4,5)
-
-- **Twist:** `T? Find<T>()` reads "null when missing" - and for T=int the
-  missing case returns 0: without a struct constraint `T?` never becomes
-  Nullable&lt;T&gt;, the question mark erases, and the caller's null guard
-  happily passes the zero through.
-- **Mechanic:** for unconstrained T, `T?` means "T, possibly default" - an
-  annotation, not a type. Reflection proves it: Find&lt;int&gt;'s return
-  type is Int32, not Nullable`1. Nullable materializes only under
-  `where T : struct`. Inside generic code `x != null` is always true for
-  value-type T (0 boxes to a live object), so the missing-value signal
-  collapses into a perfectly valid 0/false/Guid.Empty. Zero warnings at
-  any point.
-- **Who hits it:** post-NRT generic APIs - `TValue? GetOrDefault`,
-  `T? Find`, cache lookups - written and reviewed against reference
-  types, then instantiated with int, decimal, or Guid. The signature
-  promises null-signaling; the instantiation cannot deliver it.
-- **Repro:** `static T? Find<T>(bool found, T value) => found ? value :
-  default;` - missing string is null, missing int is 0; a generic
-  `Process(T? x)` guarded by `x != null` skips the missing string and
-  *processes the missing int as 0*; `MakeGenericMethod(typeof(int))
-  .ReturnType` prints Int32; the `where T : struct` twin returns a real
-  null. Deterministic, no packages.
-- **Damage:** "missing" processed as real zeros - a 0.00 price, a zero
-  quantity, an all-zeros Guid key flowing into business logic through a
-  guard every reviewer reads as airtight.
-- **ADJACENCY:** nullability's seed `default-of-t-is-null` is the
-  reference-type half of this family (default returning null despite the
-  annotation); this is the value-type half (null-signaling silently
-  becoming zero-signaling). Two doors, one broken belief about generic
-  defaults.
-- **😈 seed:** Guid is the worst case: Guid.Empty from a "null-returning"
-  lookup passes the guard and becomes a real key downstream - all-zeros
-  GUIDs in the database are this bug's fingerprint, found long after.
-- **Verified:** ran on .NET 10 (2026-07-24): missing string null, missing
-  int 0; the != null guard processed the 0; ReturnType Int32 not
-  Nullable; the struct-constrained version returned a real null.
-
 ### variance-skips-value-types (A4,5)
 
 - **Twist:** a List&lt;string&gt; IS an IEnumerable&lt;object&gt;; a
@@ -124,9 +70,9 @@
 Not yet a full candidate - brainstorm before proposing.
 
 - **generics:** a static constructor in `Registry<T>` "runs once" but
-  actually runs once *per closed type* - same broken model as
-  static-field-per-closed-type; fold in as that exhibit's 😈 rather than a
-  second exhibit.
+  actually runs once *per closed type* - the per-closed-type statics model
+  (static-field-per-closed-type was rejected 2026-08-05, see `rejected.md`).
+  Only promote if reframed with a fresh twist and damage.
 
 - **backtick-names-collide** - typeof(List&lt;int&gt;).Name and
   typeof(List&lt;string&gt;).Name are both ``List`1`` (verified

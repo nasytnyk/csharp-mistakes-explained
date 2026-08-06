@@ -40,6 +40,8 @@ in the "reason" column; they encode the curation bar.
 | mutating-a-boxed-struct | curator's discretion (no reason) | discarded while triaging the Boxing hall (he took unbox-must-match-exact-type, boxed-values-are-equal-not-same, nullable-boxes-to-nothing, boxed-enum-isnt-its-number); no reason given. Bug: mutating a struct through an interface mutates the box, not your variable. |
 | ternary-unifies-then-boxes | curator's discretion (no reason) | same Boxing triage, no reason. Bug: `object x = c ? 5 : 3.14` boxes the arms' unified compile-time type (double), so `x is int` is false even when the int arm ran. |
 | boxed-enum-isnt-its-number | curator's discretion (no reason) | "відхиляй цей, не сподобався" - built as #0044 and verified, but on PR review he didn't like it; PR #18 closed, not merged. Taste call, no analytical reason. Bug: a boxed enum is not Equal to a boxed int (dictionary/Equals miss) though the (int) cast bridges them. |
+| static-field-per-closed-type | curator's discretion (no reason) | discarded while triaging the Generics hall (he took variance-skips-value-types, sort-compiles-for-anything); no reason. Bug: a static field in a generic type is one field per closed type (Cache<int> vs Cache<string>), so a "global" counter/cache silently shards by T. |
+| t-question-mark-is-not-nullable | curator's discretion (no reason) | same Generics triage, no reason. Bug: unconstrained `T?` is an annotation, not Nullable<T>, so `T? Find<T>()` returns 0 (not null) for T=int and null-guards pass it through. |
 
 ## Reason categories (the bar, distilled)
 
