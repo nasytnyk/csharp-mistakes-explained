@@ -33,13 +33,13 @@ per hall. New halls: add a row here first.
 | inheritance | 🪆 | Inheritance |
 | memory | 💾 | Memory |
 | boxing | 🥊 | Boxing |
+| generics | 🧬 | Generics |
 
 ## Planned - language mechanics
 
 | slug | emoji | front-page name |
 |------|:--:|---|
 | nullability | 🕳️ | Nullability |
-| generics | 🧬 | Generics |
 | enums | 🏷️ | Enums |
 
 ## Planned - runtime & resources

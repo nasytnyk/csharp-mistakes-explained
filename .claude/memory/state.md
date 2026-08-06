@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **43** | Halls: **19** | Next free id: **0044**
-- Last updated after: #0043 (2026-08-05) - nullable-boxes-to-nothing
+- Exhibits: **44** | Halls: **20** | Next free id: **0045**
+- Last updated after: #0044 (2026-08-05) - variance-skips-value-types (opened the Generics hall)
 
 ## Exhibits shipped
 
@@ -52,14 +52,15 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0041 | boxing | unbox-must-match-exact-type | 4,5 |
 | 0042 | boxing | boxed-values-are-equal-not-same | 2,4 |
 | 0043 | boxing | nullable-boxes-to-nothing | 4,5 |
+| 0044 | generics | variance-skips-value-types | 4,5 |
 
 ## Halls
 
-**19 opened, 10 planned** (29 total). Full registry (slugs, emoji, status) is in
+**20 opened, 9 planned** (29 total). Full registry (slugs, emoji, status) is in
 `halls.md` - taxonomy expanded to ~30 on 2026-07-19; `regex` retired at hall
 level 2026-07-24 (see `rejected.md`); Memory opened 2026-08-05 by #0038, Boxing
-by #0041. Async + Memory backlogs cleared 2026-08-05 (see `rejected.md`); other
-planned halls remain stocked.
+by #0041, Generics by #0044. Async, Memory, and Boxing backlogs cleared 2026-08-05
+(see `rejected.md`); other planned halls remain stocked.
 
 ## Infra status
 

@@ -1,38 +1,7 @@
 # 🧬 generics
 
-> Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
+> Status: **opened** (2026-08-05, by #0044 variance-skips-value-types). Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
-
-### variance-skips-value-types (A4,5)
-
-- **Twist:** a List&lt;string&gt; IS an IEnumerable&lt;object&gt;; a
-  List&lt;int&gt; is NOT - covariance covers reference types only, so the
-  same `is` check answers opposite for the two most ordinary lists in the
-  codebase.
-- **Mechanic:** `out T` variance is legal only for reference conversions:
-  boxing changes representation, so int-to-object does not qualify.
-  List&lt;string&gt; passes `is IEnumerable<object>`, List&lt;int&gt;
-  fails it; string[] and int[] split identically. Nothing at the call
-  site hints at the reference-types-only rule. The fix is the non-generic
-  `System.Collections.IEnumerable`, which every List&lt;T&gt; implements.
-- **Who hits it:** "iterate anything" plumbing - logging enrichers,
-  exporters, message handlers probing object payloads with
-  `is IEnumerable<object>` to enumerate contents. Text and DTO
-  collections take the enumeration path; int/decimal/DateTime collections
-  silently take the fallback.
-- **Repro:** two payloads (List&lt;string&gt;, List&lt;int&gt;):
-  true/false on the `is` check, same for the arrays; a PrintAll pipeline
-  enumerates the letters and reports the numbers as "not a sequence".
-  Deterministic, no packages.
-- **Damage:** value-type collections routed to the scalar path - exports
-  where numeric columns vanish while text columns flow, logs printing
-  ``List`1[System.Int32]`` as a single value - all silent.
-- **😈 seed:** it passes review and CI wherever the test payloads are
-  string-shaped - which is nearly everywhere, since humans write example
-  data in words; the first integer batch in production is the reveal.
-- **Verified:** ran on .NET 10 (2026-07-24): true/false for the lists,
-  true/false for the arrays, pipeline enumerated strings and skipped
-  ints.
 
 ### sort-compiles-for-anything (A5)
 
