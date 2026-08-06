@@ -57,32 +57,6 @@
   compiled warning-free and threw NRE; RespectNullableAnnotations made the
   same payload throw JsonException instead.
 
-### the-oblivious-boundary (A5)
-
-- **Twist:** a fully nullable-enabled caller dereferences a legacy helper's
-  result with zero warnings and dies with NRE - code without a nullable
-  context is "oblivious", and the analysis stops at its edge without ever
-  saying that it stopped.
-- **Mechanic:** types coming from `#nullable disable` code and un-annotated
-  pre-NRT libraries are null-oblivious: the compiler holds no opinion, so
-  there is no warning on the dereference and none on assignments either.
-  Nothing in the caller's file marks the boundary - warning silence looks
-  identical to verified safety.
-- **Who hits it:** every partially migrated codebase and every consumer of
-  un-annotated NuGet packages - "we enabled nullable, fixed every warning,
-  and still NRE weekly".
-- **Repro:** one file, `#nullable enable` on top: call a `#nullable disable`
-  class whose Find returns null and dereference the result - the build
-  prints zero warnings, the runtime throws NRE. Deterministic, no packages.
-- **Damage:** false confidence at project scale: the annotation effort
-  reports the codebase clean while the holes sit exactly where the risk
-  always was - the oldest code and the third-party edges.
-- **😈 seed:** adding one `#nullable enable` line inside the legacy file
-  flips the caller's dereference to a warning - the safety of every call
-  site is decided inside the callee's file, where no caller is looking.
-- **Verified:** ran on .NET 10 (2026-07-22): zero warnings on the oblivious
-  call and dereference; NRE at the annotated call site.
-
 ### the-stale-narrowing (A1,5)
 
 - **Twist:** `if (_user != null)` narrows the field, the helper call on the

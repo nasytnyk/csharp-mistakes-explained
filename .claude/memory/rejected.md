@@ -42,6 +42,7 @@ in the "reason" column; they encode the curation bar.
 | boxed-enum-isnt-its-number | curator's discretion (no reason) | "відхиляй цей, не сподобався" - built as #0044 and verified, but on PR review he didn't like it; PR #18 closed, not merged. Taste call, no analytical reason. Bug: a boxed enum is not Equal to a boxed int (dictionary/Equals miss) though the (int) cast bridges them. |
 | static-field-per-closed-type | curator's discretion (no reason) | discarded while triaging the Generics hall (he took variance-skips-value-types, sort-compiles-for-anything); no reason. Bug: a static field in a generic type is one field per closed type (Cache<int> vs Cache<string>), so a "global" counter/cache silently shards by T. |
 | t-question-mark-is-not-nullable | curator's discretion (no reason) | same Generics triage, no reason. Bug: unconstrained `T?` is an annotation, not Nullable<T>, so `T? Find<T>()` returns 0 (not null) for T=int and null-guards pass it through. |
+| the-oblivious-boundary | too niche / narrow audience | his words: "сильно специфічно" (too specific). Discarded while triaging Nullability (he took null-forgiving-lies, the-smuggled-null, the-stale-narrowing). Bug: a nullable-enabled caller dereferences a `#nullable disable`/un-annotated helper's null with zero warnings, then NREs. |
 
 ## Reason categories (the bar, distilled)
 
