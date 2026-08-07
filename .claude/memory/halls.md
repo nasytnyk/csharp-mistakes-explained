@@ -35,6 +35,7 @@ per hall. New halls: add a row here first.
 | boxing | 🥊 | Boxing |
 | generics | 🧬 | Generics |
 | nullability | 🕳️ | Nullability |
+| testing | 🧪 | Testing |
 
 ## Planned - language mechanics
 
@@ -54,7 +55,6 @@ per hall. New halls: add a row here first.
 |------|:--:|---|
 | http | 🌐 | HTTP |
 | configuration | ⚙️ | Configuration |
-| testing | 🧪 | Testing |
 | io | 📁 | IO & Files |
 
 ## Planned - strings & security

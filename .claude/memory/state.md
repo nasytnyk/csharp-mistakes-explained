@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **47** | Halls: **21** | Next free id: **0048**
-- Last updated after: #0047 (2026-08-05) - the-smuggled-null
+- Exhibits: **48** | Halls: **22** | Next free id: **0049**
+- Last updated after: #0048 (2026-08-06) - collection-assert-is-ordered (opened the Testing hall)
 
 ## Exhibits shipped
 
@@ -56,15 +56,16 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0045 | generics | sort-compiles-for-anything | 5 |
 | 0046 | nullability | null-forgiving-lies | 5 |
 | 0047 | nullability | the-smuggled-null | 5,6 |
+| 0048 | testing | collection-assert-is-ordered | 4 |
 
 ## Halls
 
-**21 opened, 8 planned** (29 total). Full registry (slugs, emoji, status) is in
+**22 opened, 7 planned** (29 total). Full registry (slugs, emoji, status) is in
 `halls.md` - taxonomy expanded to ~30 on 2026-07-19; `regex` retired at hall
-level 2026-07-24 (see `rejected.md`); Memory opened 2026-08-05 by #0038, Boxing
-by #0041, Generics by #0044, Nullability by #0046. Async, Memory, Boxing, and
-Generics backlogs cleared 2026-08-05 (see `rejected.md`); other planned halls
-remain stocked.
+level 2026-07-24 (see `rejected.md`). This session opened Memory (#0038), Boxing
+(#0041), Generics (#0044), Nullability (#0046), Testing (#0048). Security stayed
+planned (both picks rejected). Async/Memory/Boxing/Generics/Nullability backlogs
+cleared/closed 2026-08; remaining planned halls stocked.
 
 ## Infra status
 
