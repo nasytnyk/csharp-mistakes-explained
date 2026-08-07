@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **52** | Halls: **22** | Next free id: **0053**
-- Last updated after: #0052 (2026-08-07) - one-handler-kills-the-rest
+- Exhibits: **53** | Halls: **22** | Next free id: **0054**
+- Last updated after: #0053 (2026-08-07) - the-wrapper-that-stole-the-stream
 
 ## Exhibits shipped
 
@@ -61,6 +61,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0050 | numbers | the-widening-that-came-too-late | 4,5 |
 | 0051 | pattern-matching | the-banned-user-walked-in | 4,5 |
 | 0052 | events | one-handler-kills-the-rest | 5 |
+| 0053 | disposal | the-wrapper-that-stole-the-stream | 5 |
 
 ## Halls
 

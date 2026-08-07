@@ -89,37 +89,6 @@
   callback provably mid-flight; DisposeAsync's ValueTask completed only
   after the callback finished.
 
-### the-wrapper-that-stole-the-stream (A5)
-
-- **Twist:** you handed StreamReader your stream so it could *read* it -
-  and when the reader is disposed, it disposes your stream too: wrapper
-  types take ownership by default, so the helper that "just parses" kills
-  the stream for everyone after it.
-- **Mechanic:** StreamReader/StreamWriter/BinaryReader/GZipStream and kin
-  own the inner stream unless the `leaveOpen: true` constructor overload is
-  used; disposing the wrapper cascades inward. Ownership-transfer is the
-  default, and the parameter that prevents it hides at the end of the
-  longest overload.
-- **Who hits it:** helper methods that wrap a caller's stream to parse,
-  decompress, or copy - request/upload bodies, and every "read the header,
-  rewind, read the body" two-pass over one stream.
-- **Repro:** MemoryStream; `using (var r = new StreamReader(ms))` read one
-  line; then `ms.Position = 0` throws ObjectDisposedException. Repeat with
-  `leaveOpen: true` - the stream survives. Deterministic, no packages.
-- **Damage:** ObjectDisposedException far from the wrapper - or a response
-  stream closed halfway through someone else's write; the helper looks
-  textbook-correct in review, the crash is in a different method later.
-- **MIRROR NOTE:** shipped #0026 is "you disposed a dependency you were
-  handed"; this is the library doing that *to you* - the wrapper disposes
-  what it didn't create. The same ownership axiom from the other side;
-  flagged so the curator decides whether the pairing reinforces or repeats.
-- **😈 seed:** GZipStream makes it nastier: forget `leaveOpen` on the
-  *write* path and disposing the wrapper both finalizes the archive and
-  closes the output stream - the two behaviors are inseparable, so the fix
-  for one bug reintroduces the other.
-- **Verified:** ran on .NET 10 (2026-07-22): ObjectDisposedException on
-  Position after wrapper dispose; leaveOpen kept the stream usable.
-
 ### using-var-disposes-late (A6,1)
 
 - **Twist:** `using var` has no closing brace - the resource lives to the
