@@ -52,39 +52,6 @@
   false, original exception reached the outer catch, filter's NRE
   unobservable.
 
-### poisoned-static-constructor (A5,6)
-
-- **Twist:** the config was missing for one second at startup, the static
-  constructor threw, and now the type is dead for the life of the
-  process - every later access throws TypeInitializationException with the
-  *original* error, long after the config came back.
-- **Mechanic:** a type initializer runs at most once; if it throws, the
-  CLR caches the failure and re-throws the same TypeInitializationException
-  (wrapping the original in `.InnerException`) on every subsequent access -
-  the static ctor never runs again. So a transient cause (a config not yet
-  loaded, a env var set a moment later, a dependency still warming up)
-  becomes permanent. No restart-free recovery exists.
-- **Who hits it:** static holders initialized from config/environment -
-  `static readonly` clients, cached settings, registries - touched during
-  a cold start or a brief outage window; the first unlucky access poisons
-  the type for everyone after.
-- **Repro:** a `static Registry` whose ctor throws while a flag is set;
-  access it (TypeInitializationException), clear the flag ("we fixed the
-  config"), access again - still TypeInitializationException with the same
-  inner. Deterministic, no packages.
-- **Damage:** one transient blip at startup takes a subsystem down until
-  restart - and the error everyone sees (TypeInitializationException) names
-  the type, not the config that was briefly missing, so the fix (already
-  applied) looks like it did nothing.
-- **😈 seed:** the wrapper hides the cause and the caching hides the
-  timing - by the time anyone reads the log the real error is gone from
-  the environment and buried one `.InnerException` deep, so the incident
-  reads as "the type just refuses to load".
-- **Verified:** ran on .NET 10 (2026-07-24): first access threw
-  TypeInitializationException (inner InvalidOperationException); after
-  clearing the cause, two further accesses threw the same, ctor never
-  re-ran.
-
 ### result-wraps-await-unwraps (A4,5)
 
 - **Twist:** the same faulted task throws two different exception *types*

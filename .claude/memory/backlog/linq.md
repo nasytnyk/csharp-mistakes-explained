@@ -27,28 +27,6 @@
   the production one.
 - **Verified:** ran on .NET 10 (2026-07-22): Average of {10, null, 20} == 15.
 
-### oftype-eats-the-evidence (A4,5)
-
-- **Twist:** Cast&lt;T&gt; throws on the first wrong element; OfType&lt;T&gt;
-  silently drops it - the "safer" spelling of the same line quietly deletes
-  records.
-- **Mechanic:** both filter an untyped sequence to T. `Cast<T>` throws
-  InvalidCastException at the first non-T; `OfType<T>` skips non-Ts (that is
-  its contract - but people reach for it as "Cast that doesn't crash").
-  Swapping one for the other converts a loud type bug into silent record
-  loss. Extra nuance: OfType also drops nulls; Cast passes them through.
-- **Who hits it:** legacy non-generic collections (ArrayList, DataTable
-  rows), heterogeneous object graphs, deserialized payloads - anywhere
-  someone "fixes" a Cast crash by switching to OfType instead of asking why a
-  wrong-typed item exists at all.
-- **Repro:** an object[] of order lines with one wrong-typed element; the
-  Cast version crashes honestly; the OfType version totals one line short and
-  reports success. Deterministic, no packages.
-- **Damage:** totals and exports silently missing records - and the type bug
-  OfType was hiding ships unfixed, forever.
-- **Verified:** ran on .NET 10 (2026-07-22): Cast threw InvalidCastException,
-  OfType returned 2 of 3.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
