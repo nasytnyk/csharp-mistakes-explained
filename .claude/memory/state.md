@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **48** | Halls: **22** | Next free id: **0049**
-- Last updated after: #0048 (2026-08-06) - collection-assert-is-ordered (opened the Testing hall)
+- Exhibits: **49** | Halls: **22** | Next free id: **0050**
+- Last updated after: #0049 (2026-08-06) - static-state-leaks-between-tests
 
 ## Exhibits shipped
 
@@ -57,6 +57,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0046 | nullability | null-forgiving-lies | 5 |
 | 0047 | nullability | the-smuggled-null | 5,6 |
 | 0048 | testing | collection-assert-is-ordered | 4 |
+| 0049 | testing | static-state-leaks-between-tests | 6,5 |
 
 ## Halls
 
