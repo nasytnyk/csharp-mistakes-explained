@@ -111,41 +111,6 @@
   `unsaved == null` true / `is null` false; unguarded-body operator threw
   NRE from `e == null`.
 
-### the-banned-user-walked-in (A4,5)
-
-- **Twist:** a constant pattern on a [Flags] enum is exact equality, not
-  HasFlag: `access is not Access.Banned` is true for `Banned | Muted` - the
-  ban check waves through precisely the users who earned a second flag.
-- **Mechanic:** `is Access.Banned` compiles to `value == Access.Banned` -
-  whole-value equality against the single constant. Any combined flags
-  value (`Banned | Muted`) is not equal to the lone constant, so the
-  positive check misses it and the negated check passes it. `HasFlag` (or
-  `(value & flag) != 0`) is the bitwise question; patterns cannot ask it.
-  Reads perfectly in English either way, which is the trap.
-- **Who hits it:** [Flags] permission and status enums guarded with the
-  modern pattern syntax - IDE style hints push `== `-to-`is` rewrites, and
-  `if (user.Access is not Access.Banned)` looks like the cleaned-up form of
-  a HasFlag check while being a different question entirely.
-- **Repro:** `[Flags] enum Access { None = 0, Banned = 1, Muted = 2 }`;
-  `var user = Access.Banned | Access.Muted;` - `user is not Access.Banned`
-  prints true, `user.HasFlag(Access.Banned)` prints true, and a switch with
-  a `Access.Banned => "blocked"` arm routes the banned user to the welcome
-  branch. Deterministic, no packages.
-- **Damage:** a security gate that holds only for single-flag users: ban a
-  user, mute them too, and the ban stops existing - silent, and the audit
-  log shows the Banned bit set the entire time.
-- **NOTE on adjacency:** enums hall has `the-overlapping-flags` (sequential
-  numbering makes flag 3 = 1|2). Different mechanic - that one breaks the
-  enum's *values*, this one breaks the *check*; this lives here because the
-  broken belief is about what a constant pattern compiles to.
-- **😈 seed:** the same rewrite in reverse: `is Access.Admin` as an
-  admin-only gate quietly locks out every admin who also holds any other
-  flag - the more trusted the user, the more flags, the more certainly the
-  gate fails.
-- **Verified:** ran on .NET 10 (2026-07-22): `(Banned | Muted) is not
-  Banned` true, HasFlag true, switch routed the banned user past the
-  blocked arm.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
