@@ -26,33 +26,6 @@
   server's timezone.
 - **Verified:** `==` semantics documented; verify at build with pinned zones.
 
-### the-25-hour-day (A6)
-
-- **Twist:** AddHours(24) is not "tomorrow, same time" - across a DST
-  transition the same wall time is 23 or 25 hours away, and the daily job
-  drifts an hour off, twice a year.
-- **Mechanic:** DateTime arithmetic is pure tick math; wall-clock time is
-  ticks *interpreted through a zone*, and on two days a year the mapping
-  shifts. "next run = last + 24h" lands on 02:00 instead of 03:00 after the
-  spring transition. Correct scheduling converts through TimeZoneInfo at each
-  occurrence instead of adding a fixed duration.
-- **Who hits it:** hand-rolled daily schedulers, "24-hour" token lifetimes,
-  billing cut-offs - anything that *means* "03:00 local tomorrow" but
-  *computes* +24 hours.
-- **Repro:** pin `TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv")` (never
-  TimeZoneInfo.Local - CI-would-lie), pick the known transition date, show
-  last+24h converts to 02:00 wall time, not 03:00. Deterministic because zone
-  and date are constants. No packages.
-- **Damage:** the maintenance window fires during business hours; daily
-  boundaries shift so one "day" of records is 23 hours long.
-- **BUILDER WARNING:** #0020 (shrinking-billing-day) lives in this hall and
-  is also DST-driven. Before building, read #0020 and aim this exhibit at
-  the *scheduler drift* (next-run computation), not the day-length itself;
-  if the overlap still feels too close, propose replacing rather than
-  duplicating.
-- **Verified:** timezone math documented; verify at build with pinned zone,
-  after the #0020 overlap check.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.

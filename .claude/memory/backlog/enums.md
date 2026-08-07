@@ -25,35 +25,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): (Read|Write).HasFlag(Delete)
   == true.
 
-### hasflag-zero-always-true (A5)
-
-- **Twist:** `user.HasFlag(Permission.None)` is true for every user in the
-  system - zero is a subset of everything - so the "no-access" branch
-  either runs for everyone or the check quietly means nothing.
-- **Mechanic:** HasFlag(f) computes `(value & f) == f`; with f = 0 both
-  sides are 0 and the answer is always true. The manual idiom it
-  replaced - `(value & flag) != 0` - answers *false* for the same
-  question, so the modernization from bitwise to HasFlag flips semantics
-  precisely on the zero member. The only honest spelling for "no flags"
-  is `value == Permission.None`.
-- **Who hits it:** [Flags] enums with a None member - permission systems,
-  feature gates, option sets. "Has the None permission" reads like
-  perfect English, compiles, and always answers yes.
-- **Repro:** Permission { None, Read, Write, Admin }: HasFlag(None) true
-  for a reader, a full admin, and an actual nobody; `== None` separates
-  them; `(value & None) != 0` disagrees with HasFlag. Deterministic, no
-  packages.
-- **Damage:** a guard that fires for everyone or for no one - lockout
-  logic applied to every user, or "no permissions" cleanup that never
-  runs; and because HasFlag reads like English, review approves it every
-  time.
-- **😈 seed:** the two spellings everyone treats as synonyms - HasFlag(f)
-  and `(value & f) != 0` - agree on every member *except* None: a
-  refactor in either direction silently flips the zero case.
-- **Verified:** ran on .NET 10 (2026-07-24): HasFlag(None) true for all
-  three users; == None true only for the empty one; the manual idiom
-  answered false.
-
 ### enum-default-is-zero (A5)
 
 - **Twist:** nobody assigned anything and the order is already "Active":
