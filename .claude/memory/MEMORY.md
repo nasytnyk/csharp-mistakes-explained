@@ -11,7 +11,7 @@ stocked with verified candidates. `regex` retired at hall level.
 - `halls.md` - canonical hall registry (emoji, display name, opened/planned); the front-page generator reads it.
 - `state.md` - current exhibit count, the shipped-exhibit table, next id, infra status.
 - `backlog/` - candidate exhibits, **one file per hall** (`backlog/<slug>.md`), each with a `## Seeds` tail; format and rules in `backlog/README.md`.
-- `rejected.md` - declined candidates + the curator's reasons (8 categories, incl. hall-level). **Read before proposing.**
+- `rejected.md` - flat list of declined candidates (do not rebuild/re-propose) + retired topics. **Read before proposing.**
 - `archetypes.md` - the 7 bug archetypes; the curation-balance taxonomy.
 - `todo.md` - remaining framework/infra work (CI deferred; contributor onboarding shipped).
 

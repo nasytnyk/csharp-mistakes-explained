@@ -1,69 +1,53 @@
 # Rejected
 
-What the curator declined, and WHY - so I learn his taste and stop
-re-proposing. Add a row whenever he turns something down. Watch for patterns
-in the "reason" column; they encode the curation bar.
+Candidates the curator declined - **do not rebuild or re-propose them**. His
+reasons were case-by-case and mostly a gut call, so only the list matters, not the
+why. (Shipped exhibits and numbering live in `state.md`.)
 
-| candidate | reason category | detail |
-|-----------|-----------------|--------|
-| turkish-i-login | too banal / primer-level | everyone typed a password in the wrong keyboard layout as a kid - common knowledge from the moment you touch a computer, below the museum's floor. |
-| int-overflow-in-cart | too banal / primer-level | every junior has already hit integer overflow; it's a primer, not an exhibit - people know it before they're paid to code. |
-| path-combine-betrayal | vacuum example / no who-where-how | you can't say who attacks, from where, or how - a vacuum scenario with no reproducible real-world context, so not interesting. Built and reverted at #0021 before commit. |
-| .Result deadlock | cannot reproduce honestly | the *SynchronizationContext* form (UI/legacy ASP.NET) needs a captured context a console app can't show. Rule: no exhibit that doesn't reproduce. NOTE: the *thread-pool starvation* form is a different mechanic (no context, deterministic via a pinned pool) and shipped as #0035 the-pool-that-ate-itself - this row bans only the SyncContext variant. |
-| StringBuilder-in-a-loop | proven only by timing | "trust me it's slow" is banned; timings flicker across machines. |
-| quadratic ElementAt | proven only by timing | same. |
-| culture/timezone bug w/o pinning | CI would lie | if the code doesn't pin culture/zone, the demo's outcome depends on the runner. Only ship if the code fixes the environment explicitly. |
-| datetime-kind-round-trip | premise doesn't hold | my error again: System.Text.Json round-trips DateTime correctly for all three Kinds - value, Kind and instant all survive (verified). The real versions need Newtonsoft's default DateTimeZoneHandling, a database column with no offset, or two machines in different zones - none demonstrable deterministically in one console file. Rejected before any code was written. |
-| enum-accepts-undefined | doesn't happen in real code | "in real life nobody pushes a number into an enum." The mechanic is real and non-obvious (TryParse rejects an invalid name but accepts an invalid number, so the usual validation gate is not one), but the curator does not see numeric junk arriving at an enum boundary in practice. Built and reverted at #0029 before commit. |
-| lock-on-a-string | doesn't happen in real code | "nobody in their right mind locks on a string when every tutorial screams to lock on a dedicated object." The literal-string version is textbook-warning material, not production code. The realistic cousin (lock on a runtime string, which locks nothing because runtime strings are not interned) was offered too and also declined. |
-| sort-is-unstable | no real damage | "in a normal system this practically never breaks anything." Swapping two elements that compare equal loses nothing you asked to preserve; the mechanic is real (List.Sort is stable up to 16 elements, unstable from 17) but the consequence isn't worth an exhibit. |
-| firstordefault-on-structs | premise doesn't hold | "nobody null-checks a struct - nonsense." He is right, and stronger than that: `found == null` does not even compile for a non-nullable struct, so the bug as I framed it cannot happen. My framing dressed a real nuance (default(T) is zeros, not null) in an impossible scenario. |
-| regex (entire hall) | not a footgun domain | hall-level removal, his words (translated from Ukrainian): "it's not the kind of section where you can easily screw up." Regex mistakes don't meet the museum's easy-to-make bar, so the whole topic is out: hall row deleted from halls.md, backlog/regex.md deleted with all four queued candidates (missing-anchors-pass-anything, dot-misses-newline, unescaped-regex-input, slash-d-matches-unicode-digits). Never propose regex candidates again. |
-| the-overlapping-timer | topic out of scope (curator) | his words: "timer не використовуємо в музеї" (we don't use Timer in the museum). System.Threading.Timer / recurring-timer bugs are out by his preference, real or not - a topic call, not a flaw in this candidate. Extends to the still-queued the-collected-timer (the other Timer candidate); do not propose Timer exhibits. |
-| semaphore-never-released | curator's discretion (no reason) | his words: "просто так, не хочу його розбирати" (no particular reason, doesn't want to build it). Discretionary and specific to THIS candidate - NOT a rejection of SemaphoreSlim as a topic (the-self-deadlock stays valid). No pattern to generalize. |
-| the-collected-timer | topic out of scope (curator) | his words: "таймер теж прибери, не будем його тестити в цьому проекті взагалі" (remove the timer one too, we won't test timers in this project at all). Confirms the Timer topic is fully out - see the-overlapping-timer. Both Timer candidates now gone; never propose Timer exhibits. |
-| the-cached-failure | doesn't happen in real code | his words: "і так ніхто не використає" (nobody would use it anyway). He does not see the Lazy&lt;Task&gt; / task-cache-without-failure-eviction pattern arising in real projects; his lived-experience filter overrides the textbook mechanic. |
-| threadlocal-doesnt-follow | doesn't happen in real code | his words: "теж не допустять" (they wouldn't let it happen either). In his judgment per-request state in ThreadLocal across an await does not survive real review/practice, so the bug does not occur. |
-| the-uncancellable-stream | too niche / narrow audience | his words: "мало хто пише асинк ітератори" (few people write async iterators). Real bug, but the audience that authors IAsyncEnumerable iterators is too small for the museum's everyday-accessibility bar. |
-| the-timeout-that-stopped-nothing | batch clear-out (curator) | "викидай всі 7" - cleared the whole remaining async backlog in one sweep, moving to a new hall. (Had been built once as #0036 then cancelled/reordered.) Bug: a WhenAny timeout does not cancel the abandoned work. |
-| the-self-deadlock | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: SemaphoreSlim is not reentrant, so a nested WaitAsync self-deadlocks. |
-| the-hijacked-completion | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: TaskCompletionSource.SetResult runs continuations inline on the setter's thread. |
-| the-eager-throw | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: async vs non-async Task-returning methods throw at different sites. |
-| the-linked-leak | batch clear-out (curator) | "викидай всі 7" - same async sweep. (Also built once as #0038 then cancelled, "не зайшло".) Bug: an undisposed linked CTS leaks until process shutdown. |
-| asynclocal-never-flows-up | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: an AsyncLocal write inside an async method does not flow up to the caller. |
-| trywrite-drops-silently | batch clear-out (curator) | "викидай всі 7" - same async sweep. Bug: Channel.Writer.TryWrite's ignored bool drops messages on a full bounded channel. |
-| use-after-return | curator's discretion (no reason) | discarded while triaging the Memory hall (he picked the-closure-that-held-everything to open it); no reason given, do not infer a pattern. Bug: writing through an ArrayPool array after Return, which re-rented it. |
-| the-oversized-rental | curator's discretion (no reason) | same Memory triage, no reason. Bug: ArrayPool.Rent returns >= requested and uncleared, so trusting .Length reads another renter's stale bytes. |
-| the-cache-that-owns-its-keys | curator's discretion (no reason) | same Memory triage, no reason. Bug: a Dictionary keyed by domain objects roots them forever; ConditionalWeakTable is the fix. |
-| large-array-born-in-gen2 | curator's discretion (no reason) | same Memory triage, no reason. Bug: >= 85KB allocations are born on the LOH/gen2 and survive gen-0 collections. |
-| finalizer-delays-gc | curator's discretion (no reason) | same Memory triage, no reason. Bug: adding a finalizer keeps an object alive an extra GC cycle. |
-| mutating-a-boxed-struct | curator's discretion (no reason) | discarded while triaging the Boxing hall (he took unbox-must-match-exact-type, boxed-values-are-equal-not-same, nullable-boxes-to-nothing, boxed-enum-isnt-its-number); no reason given. Bug: mutating a struct through an interface mutates the box, not your variable. |
-| ternary-unifies-then-boxes | curator's discretion (no reason) | same Boxing triage, no reason. Bug: `object x = c ? 5 : 3.14` boxes the arms' unified compile-time type (double), so `x is int` is false even when the int arm ran. |
-| boxed-enum-isnt-its-number | curator's discretion (no reason) | "відхиляй цей, не сподобався" - built as #0044 and verified, but on PR review he didn't like it; PR #18 closed, not merged. Taste call, no analytical reason. Bug: a boxed enum is not Equal to a boxed int (dictionary/Equals miss) though the (int) cast bridges them. |
-| static-field-per-closed-type | curator's discretion (no reason) | discarded while triaging the Generics hall (he took variance-skips-value-types, sort-compiles-for-anything); no reason. Bug: a static field in a generic type is one field per closed type (Cache<int> vs Cache<string>), so a "global" counter/cache silently shards by T. |
-| t-question-mark-is-not-nullable | curator's discretion (no reason) | same Generics triage, no reason. Bug: unconstrained `T?` is an annotation, not Nullable<T>, so `T? Find<T>()` returns 0 (not null) for T=int and null-guards pass it through. |
-| the-oblivious-boundary | too niche / narrow audience | his words: "сильно специфічно" (too specific). Discarded while triaging Nullability (he took null-forgiving-lies, the-smuggled-null, the-stale-narrowing). Bug: a nullable-enabled caller dereferences a `#nullable disable`/un-annotated helper's null with zero warnings, then NREs. |
-| the-stale-narrowing | too banal / primer-level | "якось банально" (somehow banal) - built as #0048 and verified, but he found it trite on PR review; PR #23 closed, not merged. Bug: nullable flow analysis keeps a field's null-check narrowing across a method call that nulls the field, so warning-free code NREs. |
-| guessable-random | curator's discretion (no reason) | "не сподобалось" (didn't like it) - built as #0048 (PR #24, which opened the Security hall) and verified, but declined on review; PR closed, branch deleted, not merged, so Security did NOT actually open. Taste call. Bug: System.Random is a deterministic PRNG, so a seeded reset token is reproducible by anyone who guesses the seed; RandomNumberGenerator is the fix. |
-| assert-equal-floats-no-tolerance | redundant / already covered | "було вже в numbers" (already covered in numbers) - the double-precision lesson is the numbers hall's territory (#0002 doubles-for-money, #0025 math-round-banker); Assert.Equal on computed doubles is the same floating-point footgun in a test wrapper. Do not re-propose float-precision exhibits. |
-| async-void-test-always-passes | too banal / primer-level | "асинк воід і так табу як і goto" (async void is already taboo, like goto) - common-knowledge forbidden, already covered by #0007 async-void and #0031 (async void via an Action delegate), and modern test frameworks fail async void test methods anyway. |
-| static-state-leaks-between-tests | curator's discretion (no reason) | "душно і не репродюсивно" - built as #0049 (PR #26) and verified deterministic, but he found it stuffy/contrived on review; PR closed, not merged. |
-| interpolated-injection | premise doesn't hold | verified on .NET 10 while prototyping the Security hall: EF Core flags BOTH natural forms of a dynamic FromSqlRaw - EF1002 for an interpolated string, EF1003 for a concatenated one - so the candidate's "silent, compiler happily allows both, one method name apart with no warning" premise is false. The injection is real (3 rows vs 1) but not silent; EF warns. Offered the honest reframe (warnings ship because warning != error); curator declined it and had me open Security with guessable-random instead. |
+## Declined candidates
 
-## Reason categories (the bar, distilled)
+- turkish-i-login
+- int-overflow-in-cart
+- path-combine-betrayal
+- .Result deadlock — the SynchronizationContext form only; the pool-starvation form shipped as #0035
+- StringBuilder-in-a-loop
+- quadratic ElementAt
+- culture/timezone bug without pinning
+- datetime-kind-round-trip
+- enum-accepts-undefined
+- lock-on-a-string
+- sort-is-unstable
+- firstordefault-on-structs
+- semaphore-never-released
+- the-cached-failure
+- threadlocal-doesnt-follow
+- the-uncancellable-stream
+- the-timeout-that-stopped-nothing
+- the-self-deadlock
+- the-hijacked-completion
+- the-eager-throw
+- the-linked-leak
+- asynclocal-never-flows-up
+- trywrite-drops-silently
+- use-after-return
+- the-oversized-rental
+- the-cache-that-owns-its-keys
+- large-array-born-in-gen2
+- finalizer-delays-gc
+- mutating-a-boxed-struct
+- ternary-unifies-then-boxes
+- boxed-enum-isnt-its-number
+- static-field-per-closed-type
+- t-question-mark-is-not-nullable
+- the-oblivious-boundary
+- the-stale-narrowing
+- guessable-random
+- interpolated-injection
+- assert-equal-floats-no-tolerance
+- async-void-test-always-passes
+- static-state-leaks-between-tests
 
-1. **Predictable finale / primer-level** - either the reader guesses the outcome from the title, OR the bug is so universally experienced (integer overflow, wrong keyboard layout) that it's common knowledge from day one - a primer, below the museum's floor. An exhibit needs a mechanic twist AND a topic that isn't already in everyone's bones. When proposing, pre-filter anything a person learns "the moment they touch a computer."
-2. **Cannot reproduce honestly** - won't fail deterministically in a single console file.
-3. **Proven only by timing** - performance claim with no hard assertion; banned.
-4. **CI would lie** - outcome depends on machine culture/zone/GC without the code pinning it.
-5. **Doesn't happen in real code** - technically real, but the author judges it too contrived to occur in actual projects. His lived-experience filter overrides textbook correctness; when unsure whether a bug is "real enough", prefer everyday-contract scenarios over exotic API footguns.
-6. **Premise doesn't hold** - my own error: the proposed scenario cannot occur as described (the compiler forbids it, the API prevents it). Before proposing, mentally compile the bad code - if it wouldn't build, the exhibit doesn't exist.
-7. **No real damage** - the mechanic is real and does occur, but in a normal system nothing meaningful breaks. Reproducing a quirk is not enough; ask what the reader actually loses. If the honest answer is "nothing you asked to keep", it isn't an exhibit.
-8. **Not a footgun domain (hall-level)** - the curator can retire an entire topic area: the domain does not generate the everyday, easy-to-make mistakes the museum collects. All of the hall's candidates are rejected at once, the hall row leaves halls.md, and its backlog file is deleted. Check new hall proposals against this bar before stocking them.
-9. **Topic out of scope (curator)** - a mechanic or API family the curator keeps out of the museum by preference, even when the bug is real (e.g. System.Threading.Timer). Rejects every candidate in that family, not only the named one; pre-filter the whole topic, not just the one slug.
-10. **Curator's discretion (no reason)** - he passed with no analytical objection ("просто так"). Specific to that one candidate; do not generalize to its topic or infer a taste pattern from it.
-11. **Too niche / narrow audience** - the mechanic is real and does bite, but too few developers write the code that triggers it to meet the museum's "accessible, everyday-contract" bar. Distinct from #5: it genuinely happens, just to a small audience (e.g. authoring async iterators).
-12. **Batch clear-out / hall fatigue (curator)** - he declines the remaining candidates of a hall as a group, in one sweep, with no per-item objection, and moves to a different hall. Empties the proposal queue without retiring the hall. Do not re-propose the cleared candidates; revisit only if he reopens the topic.
-13. **Redundant / already covered** - the mechanic is real but its lesson already lives in a shipped exhibit or another hall (e.g. float-precision belongs to numbers; async void to #0007). Do not add a second exhibit for the same broken mental model wearing different clothes.
+## Retired topics — do not propose the area at all
 
-If a new idea trips any of these, pre-filter it before proposing.
+- **regex** — entire hall retired (its `halls.md` row and `backlog/regex.md` were deleted).
+- **Timer / `System.Threading.Timer`** — topic out; both candidates declined (the-overlapping-timer, the-collected-timer).
