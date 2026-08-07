@@ -3,7 +3,7 @@ id: "0031"
 title: Handing an async lambda to Parallel.ForEach
 category: async
 tags: [async, Parallel.ForEach, async-void]
-author: nasytnyk
+author: palkotnyk
 rule: "never hand an **async** lambda to `Parallel.ForEach`"
 ---
 
