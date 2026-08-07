@@ -31,44 +31,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): -7%3 == -1, -12345%10 == -5,
   Abs(int.MinValue) threw OverflowException.
 
-### the-widening-that-came-too-late (A4,5)
-
-- **Twist:** `long ms = 30 * 24 * 60 * 60 * 1000;` is *negative* - the
-  result type is wide, but the arithmetic already ran in `int` and
-  overflowed before the widening; the `long` you reached for to be safe
-  never saw the true value.
-- **Mechanic:** the operand types decide the arithmetic, not the target.
-  `int * int` is an `int` operation; the widening to `long` (or the
-  truncation-hiding widening to `double`) happens *after* the result
-  already wrapped or truncated. Two faces from one broken belief: `int *
-  int -> long` overflows to a garbage (often negative) value, and `int /
-  int -> double` does integer division first (`7 / 8 == 0`, `(1+2)/2 ==
-  1`) then widens the wrong answer to `0.0`. The fix is to widen one
-  operand *before* the operator: `(long)a * b`, `(double)passed / total`.
-- **Who hits it:** millisecond/byte/cent computations declared `long` for
-  headroom (durations, file sizes, money in minor units) and rate/average
-  computations declared `double` - the wide type is chosen deliberately,
-  which is exactly what makes the overflow feel impossible.
-- **Repro:** `long ms = 30*24*60*60*1000` prints -1702967296;
-  `long u = 50000*50000` prints -1794967296; `double rate = 7/8` prints 0;
-  each fixed by casting one operand first. Deterministic, no packages.
-- **Damage:** a 30-day timeout that computes to a negative duration; a
-  success rate that reports 0%; a total-units count that wraps negative -
-  all assigned into a variable whose type swears it had room.
-- **ADJACENCY (for the curator):** `rejected.md` has `int-overflow-in-cart`
-  ("every junior has hit integer overflow - a primer"). This is a
-  different mental model: the developer *did* use a wide type and still
-  lost, because the conversion is too late - the belief under test is "the
-  result type governs the math", not "ints can overflow". Flagged so the
-  curator judges whether it clears the same floor.
-- **😈 seed:** small inputs make it vanish - `2 days in ms` fits `int`
-  fine, so the code ships correct and only the production-scale input
-  (30 days, a real file size) crosses 2^31; the test data is exactly the
-  range that hides it.
-- **Verified:** ran on .NET 10 (2026-07-24): 30-day ms and 50000^2 both
-  wrapped negative in `long`; `7/8` and `(1+2)/2` truncated to 0 and 1 in
-  `double`; casting one operand first fixed each.
-
 ### cast-and-convert-disagree (A4)
 
 - **Twist:** `(int)3.5` is 3 and `Convert.ToInt32(3.5)` is 4 - two

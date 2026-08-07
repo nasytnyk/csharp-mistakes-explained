@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **49** | Halls: **22** | Next free id: **0050**
-- Last updated after: #0049 (2026-08-06) - record-tostring-leaks-secrets, by @palkotnyk
+- Exhibits: **50** | Halls: **22** | Next free id: **0051**
+- Last updated after: #0050 (2026-08-07) - the-widening-that-came-too-late, by @palkotnyk
 
 ## Exhibits shipped
 
@@ -58,6 +58,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0047 | nullability | the-smuggled-null | 5,6 |
 | 0048 | testing | collection-assert-is-ordered | 4 |
 | 0049 | records | record-tostring-leaks-secrets | 5 |
+| 0050 | numbers | the-widening-that-came-too-late | 4,5 |
 
 ## Halls
 
