@@ -95,35 +95,6 @@
   by `with` (Balance = -50, no throw); init-accessor validation enforced
   on `with`.
 
-### record-tostring-leaks-secrets (A5)
-
-- **Twist:** the generated `ToString` prints every member, so the moment a
-  `Password` or `ApiToken` joins the record it appears verbatim in every
-  log line that interpolates the object - `Credentials { User = alice,
-  Password = hunter2-super-secret, ApiToken = tok_live_abc123 }`.
-- **Mechanic:** records synthesize a `ToString` that emits all public
-  properties *and public fields* in `Type { A = .., B = .. }` form.
-  `$"{user}"`, `logger.LogInformation("{User}", user)`, and exception
-  messages all call it. Nothing marks a member as secret; the only fixes
-  are overriding ToString (or the `PrintMembers` hook) or keeping the
-  secret out of the record - and adding the sensitive field is the moment
-  the leak begins, with no warning.
-- **Who hits it:** auth/config records that start innocent (a
-  `Credentials(User)` DTO) and later gain a token or password field;
-  structured logging that logs the whole object as one argument.
-- **Repro:** `record Credentials(string User, string Password, string
-  ApiToken)`; interpolate it into a "log line" - the secrets print. A
-  plain public field leaks identically. Deterministic, no packages.
-- **Damage:** credentials, tokens, and PII in plaintext logs, exception
-  messages, and error trackers - a compliance breach seeded by a
-  one-field addition that the type system and review both wave through.
-- **😈 seed:** the leak spreads by convenience - `PrintMembers` is
-  inherited, so a derived record re-leaks unless it too overrides, and
-  every `with`-copy and nested record carries the secret into its own
-  ToString.
-- **Verified:** ran on .NET 10 (2026-07-24): generated ToString printed
-  Password and ApiToken; a public field leaked the same way.
-
 ### record-equality-folds-in-type (A4,5)
 
 - **Twist:** two records with byte-identical data are *not* equal because
