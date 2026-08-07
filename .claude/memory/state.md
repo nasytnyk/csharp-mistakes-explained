@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **51** | Halls: **22** | Next free id: **0052**
-- Last updated after: #0051 (2026-08-07) - the-banned-user-walked-in, by @palkotnyk
+- Exhibits: **52** | Halls: **22** | Next free id: **0053**
+- Last updated after: #0052 (2026-08-07) - one-handler-kills-the-rest
 
 ## Exhibits shipped
 
@@ -60,6 +60,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0049 | records | record-tostring-leaks-secrets | 5 |
 | 0050 | numbers | the-widening-that-came-too-late | 4,5 |
 | 0051 | pattern-matching | the-banned-user-walked-in | 4,5 |
+| 0052 | events | one-handler-kills-the-rest | 5 |
 
 ## Halls
 
