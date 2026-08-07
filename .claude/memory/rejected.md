@@ -46,6 +46,14 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - assert-equal-floats-no-tolerance
 - async-void-test-always-passes
 - static-state-leaks-between-tests
+- length-lies-about-emoji
+- baseaddress-eats-your-path
+- hasflag-zero-always-true
+- the-25-hour-day
+- poisoned-static-constructor
+- oftype-eats-the-evidence
+- the-renumbered-status
+- stale-tracked-entity
 
 ## Retired topics — do not propose the area at all
 

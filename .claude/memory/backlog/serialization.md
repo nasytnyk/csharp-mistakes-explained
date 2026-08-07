@@ -26,32 +26,6 @@
   still garbage, and every consumer now binds to Item1/Item2 forever.
 - **Verified:** ran on .NET 10 (2026-07-22): Serialize((1, "a")) == "{}".
 
-### the-renumbered-status (A2,5)
-
-- **Twist:** STJ writes enums as bare numbers; insert one member and
-  yesterday's stored "Cancelled" deserializes as today's "Shipped" - every
-  archived record silently rewrites its own history.
-- **Mechanic:** default enum serialization is the underlying integer - a
-  *positional* identity. Reordering members, inserting one, or alphabetizing
-  the file re-maps every number to whichever member now wears it. No error is
-  possible: any integer deserializes into an enum, defined or not. The bug
-  spans deploys, which is why no single-version test can ever catch it.
-- **Who hits it:** anyone persisting JSON - documents in a DB, messages in a
-  queue, cached API responses - across more than one release of the code.
-- **Repro:** simulate two deploys in one file: serialize
-  `StatusV1 { Pending=0, Shipped=1, Cancelled=2 }`, deserialize the same
-  string as `StatusV2 { Pending=0, OnHold=1, Shipped=2, Cancelled=3 }`
-  (someone inserted OnHold) - stored Cancelled(2) now reads as Shipped.
-  Needs `#:property PublishAot=false`. Deterministic.
-- **Damage:** cancelled orders start shipping; the audit trail stays
-  internally consistent and entirely wrong - textbook silent data
-  corruption with money stakes.
-- **😈 seed:** `JsonStringEnumConverter` protects new writes but cannot fix
-  the numbers already stored - by the time the bug is noticed, the corruption
-  is baked into the archive.
-- **Verified:** ran on .NET 10 (2026-07-22): V1.Cancelled round-tripped into
-  V2.Shipped.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
