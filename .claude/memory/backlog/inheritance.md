@@ -1,43 +1,7 @@
 # 🪆 inheritance
 
-> Status: **planned**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
+> Status: **opened**. Canonical hall registry (emoji, display name, opened/planned) is `.claude/memory/halls.md`.
 > Entry format and maintenance rules are in `.claude/memory/backlog/README.md`.
-
-### new-hides-does-not-override (A4)
-
-- **Twist:** mark a method `new` and the same object answers differently
-  through a base and a derived reference - and with a `new` *property*, one
-  object holds two values for one name, and the serializer silently picks
-  which to emit by the static type.
-- **Mechanic:** `new` severs instead of overriding: two independent members
-  share a name, selected by the variable's compile-time type. Every
-  `List<Base>` loop, base-typed parameter, and framework callback runs the
-  base one. A `new` auto-property doubles the state - writes through each
-  reference land in different backing fields - and System.Text.Json
-  serializes whichever member the serialized-as type declares:
-  `Serialize(d)` and `Serialize<Base>(d)` emit *different JSON from the
-  same object*, no error anywhere.
-- **Who hits it:** whoever accepts the IDE's `new` suggestion to silence
-  CS0108 - typically after a base class from a library update gains a
-  member the derived class already had - and everyone who "overrides" a
-  non-virtual method because `new` compiles.
-- **Repro:** base/derived with `new string Title()` and
-  `new string Name { get; set; }`: print through both references, loop a
-  `Base[]` (base title every time), write Name through both and show both
-  values alive, then STJ both ways. JSON half needs
-  `#:property PublishAot=false`; the core needs no packages.
-- **Damage:** polymorphism silently absent exactly where the object travels
-  as its base type - which is everywhere frameworks touch it - while
-  direct calls behave "fixed"; with the property, a write vanishes
-  depending on which reference wrote and which type serialized.
-- **😈 seed:** version drift plants it without anyone typing `new`: the
-  base library ships a member your derived class already had - CS0108 is
-  just a warning, and from that build on, one name means two things in
-  every object.
-- **Verified:** ran on .NET 10 (2026-07-22): same object returned "derived
-  title"/"base title" by reference type; Base[] loop called base for every
-  element; both Name values coexisted; STJ emitted different JSON for
-  Serialize vs Serialize&lt;Base&gt; without any exception.
 
 ### default-arg-from-static-type (A4)
 
