@@ -55,6 +55,7 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-renumbered-status
 - stale-tracked-entity
 - the-twin-singletons
+- getoradd-runs-twice
 
 ## Retired topics — do not propose the area at all
 
