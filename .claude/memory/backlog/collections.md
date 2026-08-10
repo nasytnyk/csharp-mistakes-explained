@@ -26,30 +26,6 @@
   legally change observed order with zero code changes.
 - **Verified:** documented internal layout, widely reproduced; verify at build.
 
-### getoradd-runs-twice (A5,6)
-
-- **Twist:** ConcurrentDictionary is thread-safe, your factory is not: two
-  threads enter GetOrAdd together, the "runs exactly once" factory runs twice,
-  and one result is silently discarded.
-- **Mechanic:** `GetOrAdd(key, valueFactory)` invokes the factory *outside*
-  the internal lock (documented). Two threads asking for the same missing key
-  can both run the factory; only one produced value is stored, the loser is
-  thrown away - but the loser's *side effects* are not undone.
-- **Who hits it:** caches of expensive resources: connections, sessions,
-  "create the customer row on first order". The factory opens a socket or
-  INSERTs a row; under concurrency it does so twice.
-- **Repro:** the factory increments a counter and blocks on a `Barrier(2)`, so
-  the demo *proves* both threads are inside the factory simultaneously, then
-  returns; assert factory ran 2 times while the dictionary holds 1 value.
-  Deterministic - the barrier replaces any timing assumption. No packages.
-- **Damage:** duplicate side effects (two rows, two charges, two connections)
-  under a green log; the dictionary itself looks perfectly consistent
-  afterwards, so nothing points at the cache.
-- **😈 seed:** the standard fix is caching `Lazy<T>` - which walks straight
-  into `the-cached-failure` (async hall). The two exhibits cross-link.
-- **Verified:** ran on .NET 10 (2026-07-22): barrier repro, factory ran 2x,
-  one value stored.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
