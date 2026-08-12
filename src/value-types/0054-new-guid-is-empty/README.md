@@ -3,7 +3,7 @@ id: "0054"
 title: new Guid() is empty, not new
 category: value-types
 tags: [value-types, Guid, default]
-rule: "never call `new Guid()` for a fresh id - it is **Guid.Empty**; use `Guid.NewGuid()`"
+rule: "never call `new Guid()` - it is empty; use `Guid.NewGuid()`"
 ---
 
 # #0054 - new Guid() Is Empty, Not New

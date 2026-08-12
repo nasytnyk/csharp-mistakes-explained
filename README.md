@@ -48,7 +48,7 @@ and the mechanic behind it.
 ### 📦 Value Types
 
 - [0011](src/value-types/0011-defensive-copy-ambush/) never write a **mutable struct**
-- [0054](src/value-types/0054-new-guid-is-empty/) never call `new Guid()` for a fresh id - it is **Guid.Empty**; use `Guid.NewGuid()`
+- [0054](src/value-types/0054-new-guid-is-empty/) never call `new Guid()` - it is empty; use `Guid.NewGuid()`
 
 ### 💥 Exceptions
 
