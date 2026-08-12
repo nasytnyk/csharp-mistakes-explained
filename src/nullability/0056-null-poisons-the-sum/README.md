@@ -3,7 +3,7 @@ id: "0056"
 title: one null poisons the whole sum
 category: nullability
 tags: [nullability, decimal, arithmetic]
-rule: "never sum nullables with raw `+=` - a single **null** turns the whole total null; use `?? 0` or `.Sum()`"
+rule: "never sum nullables with `+=` - a single **null** makes all null; use `?? 0` or `.Sum()`"
 ---
 
 # #0056 - One Null Poisons the Whole Sum

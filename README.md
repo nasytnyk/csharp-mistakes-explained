@@ -123,7 +123,7 @@ and the mechanic behind it.
 
 - [0046](src/nullability/0046-null-forgiving-lies/) never silence a nullable warning with `!` - it checks **nothing** at runtime
 - [0047](src/nullability/0047-the-smuggled-null/) never assume deserialization respects your **non-nullable** annotations
-- [0056](src/nullability/0056-null-poisons-the-sum/) never sum nullables with raw `+=` - a single **null** turns the whole total null; use `?? 0` or `.Sum()`
+- [0056](src/nullability/0056-null-poisons-the-sum/) never sum nullables with `+=` - a single **null** makes all null; use `?? 0` or `.Sum()`
 
 ### 🧪 Testing
 
