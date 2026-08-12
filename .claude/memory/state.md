@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **55** | Halls: **22** | Next free id: **0056**
-- Last updated after: #0055 (2026-08-07) - decimal-keeps-its-scale
+- Exhibits: **56** | Halls: **22** | Next free id: **0057**
+- Last updated after: #0056 (2026-08-07) - null-poisons-the-sum
 
 ## Exhibits shipped
 
@@ -64,6 +64,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0053 | disposal | the-wrapper-that-stole-the-stream | 5 |
 | 0054 | value-types | new-guid-is-empty | 4,5 |
 | 0055 | numbers | decimal-keeps-its-scale | 4,5 |
+| 0056 | nullability | null-poisons-the-sum | 4,5 |
 
 ## Halls
 
