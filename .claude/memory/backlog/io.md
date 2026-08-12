@@ -61,35 +61,6 @@
   prefix; ReadAllText stripped, GetString kept; culture StartsWith true
   while the ordinal header compare failed.
 
-### read-without-seeking-to-start (A5)
-
-- **Twist:** serialize into a MemoryStream, hand it to the uploader, and
-  the body that arrives is 0 bytes: the cursor is still parked at the end
-  of what you wrote, and CopyTo faithfully copies everything after it -
-  nothing - reporting success.
-- **Mechanic:** a stream has one position shared by reads and writes;
-  Serialize/Write leaves it at the end (Position == Length). CopyTo and
-  ReadToEnd start from the current position, so the round trip transfers
-  zero bytes without error. `Position = 0` is the entire fix; the fields
-  that would have told you (Length vs Position) are checked by nobody.
-- **Who hits it:** build-then-send flows - serialize to a stream for HTTP
-  StreamContent, mail attachments, blob uploads, zip entries - and
-  write-then-read-back over a single FileStream.
-- **Repro:** JsonSerializer.Serialize into a MemoryStream (32 bytes,
-  Position 32); CopyTo a destination - 0 bytes; rewind - 32; the
-  FileStream flavor round-trips the JSON after `Position = 0`.
-  Deterministic; `#:property PublishAot=false` for the JSON half.
-- **Damage:** empty uploads and attachments that report success end to
-  end - the producer logged "sent", the consumer received a well-formed
-  nothing, and the loss surfaces only through the absence of its
-  effects.
-- **😈 seed:** any refactor makes it vanish - serialize-to-string has no
-  cursor, a fresh wrapping stream resets one - so bisection points at
-  the serialization change that "broke" it, never at the Position nobody
-  sees.
-- **Verified:** ran on .NET 10 (2026-07-24): 0 bytes without rewind, 32
-  after; file flavor round-tripped the JSON.
-
 ### exists-swallows-every-error (A5)
 
 - **Twist:** File.Exists said false, so the code took the first-run path
