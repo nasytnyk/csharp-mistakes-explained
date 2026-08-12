@@ -36,6 +36,7 @@ per hall. New halls: add a row here first.
 | generics | 🧬 | Generics |
 | nullability | 🕳️ | Nullability |
 | testing | 🧪 | Testing |
+| io | 📁 | IO & Files |
 
 ## Planned - language mechanics
 
@@ -55,7 +56,6 @@ per hall. New halls: add a row here first.
 |------|:--:|---|
 | http | 🌐 | HTTP |
 | configuration | ⚙️ | Configuration |
-| io | 📁 | IO & Files |
 
 ## Planned - strings & security
 
