@@ -133,7 +133,7 @@ and the mechanic behind it.
 
 ### 📁 IO & Files
 
-- [0059](src/io/0059-read-without-seeking-to-start/) rewind before you read - a stream you just wrote is parked at the **end**, so `CopyTo` copies nothing
+- [0059](src/io/0059-read-without-seeking-to-start/) never leave `.Position` at the **end** of a stream you'll read back
 
 ## To Be Continued
 

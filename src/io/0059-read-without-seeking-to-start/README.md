@@ -3,7 +3,7 @@ id: "0059"
 title: the stream you read from the end
 category: io
 tags: [IO, Stream, MemoryStream]
-rule: "rewind before you read - a stream you just wrote is parked at the **end**, so `CopyTo` copies nothing"
+rule: "never leave `.Position` at the **end** of a stream you'll read back"
 ---
 
 # #0059 - The Stream You Read From the End
