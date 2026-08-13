@@ -1,44 +1,32 @@
 // Exhibit #0060: GetType() is exact, not assignable
 
-// A dispatcher routes events to handlers registered by type. We registered one handler for
-// PaymentEvent, expecting it to cover PaymentEvent and every subclass of it.
-var handlers = new Dictionary<Type, Action<PaymentEvent>>
-{
-    [typeof(PaymentEvent)] = e => Console.WriteLine($"  handled {e.GetType().Name} (amount {e.Amount})"),
-};
-
-PaymentEvent[] incoming =
+// Audit the payment events in a batch. A refund IS a kind of payment, so it must count too.
+PaymentEvent[] batch =
 {
     new PaymentEvent { Amount = 100m },
     new RefundEvent  { Amount = 30m },   // a subclass of PaymentEvent
 };
 
-int handled = 0;
-foreach (var e in incoming)
+int payments = 0;
+foreach (var e in batch)
 {
-    Console.WriteLine($"{e.GetType().Name}: (e is PaymentEvent) = {e is PaymentEvent}");
-    if (handlers.TryGetValue(e.GetType(), out var handler)) // 💥 GetType() is the EXACT runtime type
-    {
-        handler(e);
-        handled++;
-    }
-    else
-    {
-        Console.WriteLine($"  no handler for {e.GetType().Name} - dropped");
-    }
+    bool matched = e.GetType() == typeof(PaymentEvent); // 💥 the EXACT runtime type, not "is a PaymentEvent"
+    Console.WriteLine($"{e.GetType().Name}: matched={matched}  (e is PaymentEvent = {e is PaymentEvent})");
+    if (matched)
+        payments++;
 }
 
-Console.WriteLine($"Handled {handled} of {incoming.Length} events");
+Console.WriteLine($"Counted {payments} payment events of {batch.Length}");
 
-// Self-audit: every event IS a PaymentEvent, so the one registered handler must cover them all.
-if (handled != incoming.Length)
+// Self-audit: RefundEvent : PaymentEvent, so every event in the batch is a payment event.
+if (payments != batch.Length)
 {
     throw new InvalidOperationException(
-        $"handled {handled} of {incoming.Length} - a table keyed by GetType() matches the EXACT runtime type, " +
-        "so RefundEvent (a PaymentEvent subclass) never finds the PaymentEvent handler and is silently dropped");
+        $"counted {payments} of {batch.Length} - GetType() == typeof(PaymentEvent) matches the EXACT type, " +
+        "so RefundEvent (a subclass) is skipped even though it IS a PaymentEvent");
 }
 
-Console.WriteLine("Every event reached a handler.");
+Console.WriteLine("Every payment event counted.");
 
 class PaymentEvent { public decimal Amount { get; init; } }
 class RefundEvent : PaymentEvent { }

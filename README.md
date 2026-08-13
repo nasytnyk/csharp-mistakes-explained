@@ -137,7 +137,7 @@ and the mechanic behind it.
 
 ### 🪞 Reflection
 
-- [0060](src/reflection/0060-gettype-is-exact-not-assignable/) never key a type map by `GetType()` - it's the **exact** runtime type, so subclasses never match
+- [0060](src/reflection/0060-gettype-is-exact-not-assignable/) never check for a **derived type** with `GetType()` - use `IsAssignableFrom`
 
 ## To Be Continued
 
