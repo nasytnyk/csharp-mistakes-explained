@@ -89,6 +89,88 @@
   MissingMethodException, Simple and int created, args overload worked;
   IL2091 observed under the default AOT profile.
 
+### invoke-wraps-the-exception (A5)
+
+- **Twist:** call a method through `MethodInfo.Invoke`, it throws
+  `ArgumentException`, and your `catch (ArgumentException)` around the call
+  never fires - Invoke wraps whatever the target throws in
+  `TargetInvocationException`, so type-based handling silently misses it.
+- **Mechanic:** Invoke catches the invoked method's exception and rethrows
+  it as the `InnerException` of a `TargetInvocationException`; the original
+  type - and any `catch (TSpecific)` keyed to it - is one layer down.
+  `BindingFlags.DoNotWrapExceptions` opts out (.NET Core+).
+- **Who hits it:** reflective invokers, plugin/command runners, test
+  harnesses, mediator/dispatch built on Invoke - anywhere business
+  exceptions are caught by type across a reflective call.
+- **Repro:** a method that throws ArgumentException, called via
+  GetMethod().Invoke(): `catch (ArgumentException)` misses,
+  `catch (TargetInvocationException)` catches it with the real one in
+  InnerException. Deterministic, no packages.
+- **Damage:** type-based handling (retry-on-Timeout, validation-to-400)
+  silently breaks across the reflective boundary; logs record
+  TargetInvocationException and the real cause hides in InnerException, so
+  dashboards misattribute the failure.
+- **😈 seed:** the fix people reach for - rethrow `ex.InnerException` -
+  loses the original stack trace unless they use
+  `ExceptionDispatchInfo.Throw`, trading a wrapped exception for a
+  truncated one.
+- **Verified:** ran on .NET 10 (2026-08-13): Invoke of a method throwing
+  ArgumentException surfaced as TargetInvocationException;
+  catch(ArgumentException) skipped; InnerException was the ArgumentException.
+
+### getmethod-throws-on-overloads (A5)
+
+- **Twist:** `type.GetMethod("Save")` doesn't return null or the first
+  match when Save is overloaded - it throws `AmbiguousMatchException`, so a
+  name-based reflective dispatcher works until someone adds a second
+  overload in an unrelated PR.
+- **Mechanic:** GetMethod(name) requires a *unique* match; two methods
+  sharing the name make it ambiguous and it throws rather than pick. The
+  disambiguating overload GetMethod(name, Type[] parameterTypes) is the
+  fix; GetProperty behaves the same when a `new` member or an indexer
+  collides.
+- **Who hits it:** reflective command/handler dispatch by method name,
+  serializer-ish code, DI/mediator plumbing - the lookup that passed every
+  test with one overload throws the day a second one lands.
+- **Repro:** class with Save(int) and Save(long); `GetMethod("Save")`
+  throws AmbiguousMatchException; `GetMethod("Save", new[]{typeof(int)})`
+  resolves it. Deterministic, no packages.
+- **Damage:** a crash on a call site that reviews as fine, triggered by an
+  unrelated overload added elsewhere - the reflective lookup and the new
+  overload live in different commits.
+- **😈 seed:** the "fix" GetMethods().First(m => m.Name == name)
+  reintroduces nondeterminism - GetMethods order is unspecified, so which
+  overload you call becomes runtime roulette.
+- **Verified:** ran on .NET 10 (2026-08-13): GetMethod("Save") threw
+  AmbiguousMatchException with two overloads present.
+
+### makegenerictype-skips-constraints (A4,5)
+
+- **Twist:** `typeof(Repository<>).MakeGenericType(configuredType)` builds
+  any generic you ask - then throws `ArgumentException` at runtime if the
+  type argument violates a `where` constraint the compiler would have
+  caught for free.
+- **Mechanic:** MakeGenericType/MakeGenericMethod check constraints at
+  runtime, not compile time; a `where T : class` (or `: new()`, or an
+  interface bound) violated by the supplied Type throws ArgumentException
+  with no compile-time signal, because the type argument arrived as a
+  string/Type at runtime.
+- **Who hits it:** config- or plugin-driven generic construction -
+  open-generic DI registration, a repository/handler resolved from a type
+  name, dynamic pipeline building.
+- **Repro:** `Box<T> where T : class`; MakeGenericType(typeof(int)) throws
+  ArgumentException; MakeGenericType(typeof(string)) succeeds.
+  Deterministic, no packages.
+- **Damage:** a startup/first-request crash driven by configuration, not
+  code - the generic host is fine, the supplied type isn't, and the message
+  names the constraint but not the config line that supplied the type.
+- **😈 seed:** a missing `new()` may not fail at MakeGenericType at all -
+  it surfaces later when Activator tries to construct the closed type,
+  moving the crash even further from the config that caused it.
+- **Verified:** ran on .NET 10 (2026-08-13): MakeGenericType(typeof(int))
+  on a `where T : class` open generic threw ArgumentException; a reference
+  type succeeded.
+
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
