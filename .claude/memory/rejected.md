@@ -53,6 +53,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - poisoned-static-constructor
 - oftype-eats-the-evidence
 - the-renumbered-status
+- the-overlapping-flags
+- enum-default-is-zero
+- isdefined-rejects-legal-flags
 - stale-tracked-entity
 
 ## Retired topics — do not propose the area at all
