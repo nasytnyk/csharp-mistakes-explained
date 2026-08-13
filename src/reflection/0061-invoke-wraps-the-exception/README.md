@@ -3,7 +3,7 @@ id: "0061"
 title: MethodInfo.Invoke wraps your exception
 category: reflection
 tags: [reflection, exceptions, MethodInfo]
-rule: "never `catch` a specific exception around `MethodInfo.Invoke` - it **wraps** yours in `TargetInvocationException`"
+rule: "never `catch` exception around `MethodInfo.Invoke` - it is **wrapped** in `TargetInvocationException`"
 ---
 
 # #0061 - MethodInfo.Invoke Wraps Your Exception

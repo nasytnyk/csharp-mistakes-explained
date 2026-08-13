@@ -138,7 +138,7 @@ and the mechanic behind it.
 ### 🪞 Reflection
 
 - [0060](src/reflection/0060-changetype-chokes-on-nullable/) never `Convert.ChangeType` into a **nullable** type - unwrap it with `Nullable.GetUnderlyingType` first
-- [0061](src/reflection/0061-invoke-wraps-the-exception/) never `catch` a specific exception around `MethodInfo.Invoke` - it **wraps** yours in `TargetInvocationException`
+- [0061](src/reflection/0061-invoke-wraps-the-exception/) never `catch` exception around `MethodInfo.Invoke` - it is **wrapped** in `TargetInvocationException`
 
 ## To Be Continued
 
