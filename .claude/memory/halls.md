@@ -38,12 +38,6 @@ per hall. New halls: add a row here first.
 | testing | 🧪 | Testing |
 | io | 📁 | IO & Files |
 
-## Planned - language mechanics
-
-| slug | emoji | front-page name |
-|------|:--:|---|
-| enums | 🏷️ | Enums |
-
 ## Planned - runtime & resources
 
 | slug | emoji | front-page name |

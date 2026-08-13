@@ -137,6 +137,6 @@ and the mechanic behind it.
 
 ## To Be Continued
 
-🏷️ Enums · 🪞 Reflection · 🌐 HTTP · ⚙️ Configuration · 🧵 Strings · 🔒 Security
+🪞 Reflection · 🌐 HTTP · ⚙️ Configuration · 🧵 Strings · 🔒 Security
 
 <!-- EXHIBITS:END -->

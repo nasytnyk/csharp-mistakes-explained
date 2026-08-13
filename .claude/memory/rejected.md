@@ -14,7 +14,6 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - quadratic ElementAt
 - culture/timezone bug without pinning
 - datetime-kind-round-trip
-- enum-accepts-undefined
 - lock-on-a-string
 - sort-is-unstable
 - firstordefault-on-structs
@@ -48,14 +47,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - static-state-leaks-between-tests
 - length-lies-about-emoji
 - baseaddress-eats-your-path
-- hasflag-zero-always-true
 - the-25-hour-day
 - poisoned-static-constructor
 - oftype-eats-the-evidence
 - the-renumbered-status
-- the-overlapping-flags
-- enum-default-is-zero
-- isdefined-rejects-legal-flags
 - stale-tracked-entity
 
 ## Retired topics — do not propose the area at all
