@@ -37,11 +37,6 @@ per hall. New halls: add a row here first.
 | nullability | 🕳️ | Nullability |
 | testing | 🧪 | Testing |
 | io | 📁 | IO & Files |
-
-## Planned - runtime & resources
-
-| slug | emoji | front-page name |
-|------|:--:|---|
 | reflection | 🪞 | Reflection |
 
 ## Planned - ecosystem
