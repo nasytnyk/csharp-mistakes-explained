@@ -24,39 +24,6 @@
 - **Verified:** ran on .NET 10 (2026-07-22): SetValue on the boxed copy,
   variable unchanged.
 
-### gettype-is-exact-not-assignable (A4,5)
-
-- **Twist:** `obj.GetType() == typeof(PaymentEvent)` is false for every
-  subclass, so the type-keyed dispatcher silently skips them - and the
-  "fix", IsAssignableFrom, reads naturally in exactly the backwards order,
-  which upgrades "misses subclasses" to "misses everything".
-- **Mechanic:** GetType() returns the exact runtime type and `==` compares
-  identity, not assignability: a `Dictionary<Type, Handler>` keyed by a
-  base type misses every derived instance while `is` keeps saying true.
-  `Type.IsAssignableFrom`'s argument order is the reverse of the English
-  reading: correct is `typeof(Base).IsAssignableFrom(candidate)`; the
-  readable-but-wrong `candidate.IsAssignableFrom(typeof(Base))` returns
-  false for everything. .NET 5 added `IsAssignableTo` precisely because of
-  this.
-- **Who hits it:** message/event dispatchers and plugin scanners keyed by
-  Type. ORM proxies sharpen it (documented, not run here): a lazy-loading
-  proxy's GetType() is a runtime subclass, so proxied entities fall out of
-  GetType()-keyed maps that worked in every test.
-- **Repro:** `Dictionary<Type, string>` holding typeof(PaymentEvent); a
-  `RefundEvent : PaymentEvent` instance - `is` true, ContainsKey false.
-  Then both IsAssignableFrom orders; a type scan finds 0 backwards and 2
-  in the correct order. Deterministic, no packages.
-- **Damage:** silently unhandled messages: the new subclass compiles,
-  `is`-based tests pass, the dispatcher routes it to the fallback; the
-  backwards scan ships an empty plugin list that reads as "none installed".
-- **😈 seed:** the backwards call is self-confirming: the quick sanity
-  check people run - same type on both sides - is reflexively true in
-  either order, so the one test that "proves the call works" cannot catch
-  the swap.
-- **Verified:** ran on .NET 10 (2026-07-22): ContainsKey false while `is`
-  true; backwards IsAssignableFrom false (scan found 0), correct order
-  true (scan found 2).
-
 ### getproperty-misses-nonpublic (A5)
 
 - **Twist:** `GetProperty("Channel")` returns null for an internal
