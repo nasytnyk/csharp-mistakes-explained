@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **60** | Halls: **24** | Next free id: **0061**
-- Last updated after: #0060 (2026-08-13) - changetype-chokes-on-nullable (opened 🪞 reflection hall)
+- Exhibits: **61** | Halls: **24** | Next free id: **0062**
+- Last updated after: #0061 (2026-08-13) - invoke-wraps-the-exception
 
 ## Exhibits shipped
 
@@ -69,6 +69,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0058 | inheritance | the-override-that-wasnt | 4,5 |
 | 0059 | io | read-without-seeking-to-start | 5 |
 | 0060 | reflection | changetype-chokes-on-nullable | 4 |
+| 0061 | reflection | invoke-wraps-the-exception | 5 |
 
 ## Halls
 

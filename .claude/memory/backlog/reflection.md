@@ -89,35 +89,6 @@
   MissingMethodException, Simple and int created, args overload worked;
   IL2091 observed under the default AOT profile.
 
-### invoke-wraps-the-exception (A5)
-
-- **Twist:** call a method through `MethodInfo.Invoke`, it throws
-  `ArgumentException`, and your `catch (ArgumentException)` around the call
-  never fires - Invoke wraps whatever the target throws in
-  `TargetInvocationException`, so type-based handling silently misses it.
-- **Mechanic:** Invoke catches the invoked method's exception and rethrows
-  it as the `InnerException` of a `TargetInvocationException`; the original
-  type - and any `catch (TSpecific)` keyed to it - is one layer down.
-  `BindingFlags.DoNotWrapExceptions` opts out (.NET Core+).
-- **Who hits it:** reflective invokers, plugin/command runners, test
-  harnesses, mediator/dispatch built on Invoke - anywhere business
-  exceptions are caught by type across a reflective call.
-- **Repro:** a method that throws ArgumentException, called via
-  GetMethod().Invoke(): `catch (ArgumentException)` misses,
-  `catch (TargetInvocationException)` catches it with the real one in
-  InnerException. Deterministic, no packages.
-- **Damage:** type-based handling (retry-on-Timeout, validation-to-400)
-  silently breaks across the reflective boundary; logs record
-  TargetInvocationException and the real cause hides in InnerException, so
-  dashboards misattribute the failure.
-- **😈 seed:** the fix people reach for - rethrow `ex.InnerException` -
-  loses the original stack trace unless they use
-  `ExceptionDispatchInfo.Throw`, trading a wrapped exception for a
-  truncated one.
-- **Verified:** ran on .NET 10 (2026-08-13): Invoke of a method throwing
-  ArgumentException surfaced as TargetInvocationException;
-  catch(ArgumentException) skipped; InnerException was the ArgumentException.
-
 ### getmethod-throws-on-overloads (A5)
 
 - **Twist:** `type.GetMethod("Save")` doesn't return null or the first
