@@ -89,38 +89,6 @@
   MissingMethodException, Simple and int created, args overload worked;
   IL2091 observed under the default AOT profile.
 
-### changetype-chokes-on-nullable (A4)
-
-- **Twist:** the mapper converts "5" into every int, decimal, and DateTime
-  column fine - and throws InvalidCastException on `int?`:
-  Convert.ChangeType handles the whole primitive zoo except the nullable
-  wrapper around it.
-- **Mechanic:** ChangeType converts between IConvertible types;
-  Nullable&lt;T&gt; is not one, and there is no built-in unwrap - the cast
-  from String to Nullable`1 just fails. The one-line fix everyone
-  eventually finds: convert to
-  `Nullable.GetUnderlyingType(t) ?? t` - boxing then does the rest, since
-  a boxed int assigns into an int? property.
-- **Who hits it:** every hand-rolled row/CSV/config-to-object mapper (the
-  Dapper-shaped code people write themselves). It works for required
-  columns and dies the day an *optional* column arrives with a value in
-  it - exactly the field the test data always left empty.
-- **Repro:** class { int Qty; int? Discount }; loop GetProperties() with
-  `Convert.ChangeType("5", p.PropertyType)`: Qty converts, Discount
-  throws; the GetUnderlyingType fix converts both. Deterministic, no
-  packages.
-- **Damage:** the import crashes only on rows where an optional field is
-  filled - "works for months, dies on the first customer who entered a
-  discount" - and the stack blames Convert, not the schema change that
-  made the column nullable.
-- **😈 seed:** the failure is data-shaped, not code-shaped: the bug report
-  says "import crashes on THIS file", and diffing the good and bad files
-  finds nothing - the difference is one optional cell somebody finally
-  filled in.
-- **Verified:** ran on .NET 10 (2026-07-22): Int32 converted,
-  Nullable&lt;Int32&gt; threw InvalidCastException, the GetUnderlyingType
-  fix converted both.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
