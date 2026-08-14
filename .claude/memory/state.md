@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **68** | Halls: **26** | Next free id: **0069**
-- Last updated after: #0068 (2026-08-13) - secrets-in-the-query-string
+- Exhibits: **69** | Halls: **26** | Next free id: **0070**
+- Last updated after: #0069 (2026-08-13) - session-cookie-without-httponly-secure
 
 ## Exhibits shipped
 
@@ -77,6 +77,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0066 | security | the-server-that-trusted-the-request | 4,5 |
 | 0067 | security | leaking-exception-details | 5 |
 | 0068 | security | secrets-in-the-query-string | 5 |
+| 0069 | security | session-cookie-without-httponly-secure | 5 |
 
 ## Halls
 
