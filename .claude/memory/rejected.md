@@ -51,6 +51,8 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-renumbered-status
 - stale-tracked-entity
 - gettype-is-exact-not-assignable
+- no-ensuresuccess-reads-error-body
+- request-messages-are-single-use
 
 ## Retired topics — do not propose the area at all
 
