@@ -54,6 +54,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - no-ensuresuccess-reads-error-body
 - request-messages-are-single-use
 - timeout-looks-like-cancellation
+- unencoded-query-string
+- content-type-lives-on-content-headers
+- relative-uri-needs-baseaddress
 
 ## Retired topics — do not propose the area at all
 
