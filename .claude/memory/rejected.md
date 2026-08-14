@@ -57,6 +57,11 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - unencoded-query-string
 - content-type-lives-on-content-headers
 - relative-uri-needs-baseaddress
+- aes-ecb-reveals-patterns
+- path-combine-discards-root
+- host-allowlist-bypass
+- the-culture-that-bypassed-auth
+- unsalted-hash-reveals-duplicates
 
 ## Retired topics — do not propose the area at all
 
