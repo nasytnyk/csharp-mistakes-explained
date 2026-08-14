@@ -38,12 +38,12 @@ per hall. New halls: add a row here first.
 | testing | 🧪 | Testing |
 | io | 📁 | IO & Files |
 | reflection | 🪞 | Reflection |
+| http | 🌐 | HTTP |
 
 ## Planned - ecosystem
 
 | slug | emoji | front-page name |
 |------|:--:|---|
-| http | 🌐 | HTTP |
 | configuration | ⚙️ | Configuration |
 
 ## Planned - security
