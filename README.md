@@ -149,7 +149,7 @@ and the mechanic behind it.
 ### 🔒 Security
 
 - [0065](src/security/0065-reversible-encryption-for-passwords/) never encrypt a password - encryption is **reversible**; hash it with a salted KDF
-- [0066](src/security/0066-the-server-that-trusted-the-request/) never read price or status from the **request body** - the server owns them, keyed by id
+- [0066](src/security/0066-the-server-that-trusted-the-request/) never trust the **client** - the server sets price, status, and ownership
 
 ## To Be Continued
 

@@ -3,7 +3,7 @@ id: "0066"
 title: the server that trusted the request
 category: security
 tags: [security, validation, model-binding]
-rule: "never read price or status from the **request body** - the server owns them, keyed by id"
+rule: "never trust the **client** - the server sets price, status, and ownership"
 ---
 
 # #0066 - The Server That Trusted the Request
