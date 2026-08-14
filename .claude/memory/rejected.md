@@ -64,6 +64,12 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - unsalted-hash-reveals-duplicates
 - trusting-client-supplied-price
 - mass-assignment-over-posting
+- binding-fails-silently
+- the-list-that-would-not-shrink
+- thirty-means-thirty-days
+- the-guard-that-cannot-fire
+- options-miss-the-reload
+- config-array-gap-truncates
 
 ## Retired topics — do not propose the area at all
 
