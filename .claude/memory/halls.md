@@ -46,13 +46,8 @@ per hall. New halls: add a row here first.
 | http | 🌐 | HTTP |
 | configuration | ⚙️ | Configuration |
 
-## Planned - strings & security
+## Planned - security
 
 | slug | emoji | front-page name |
 |------|:--:|---|
-| strings | 🧵 | Strings |
 | security | 🔒 | Security |
-
-> `strings-memory` is retired in favor of splitting into `strings`
-> (culture, encoding, grapheme) and `memory` (allocation, Span, GC) - two
-> different worlds. Neither was opened yet, so this is a clean rename.

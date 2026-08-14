@@ -10,7 +10,6 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - int-overflow-in-cart
 - path-combine-betrayal
 - .Result deadlock — the SynchronizationContext form only; the pool-starvation form shipped as #0035
-- StringBuilder-in-a-loop
 - quadratic ElementAt
 - culture/timezone bug without pinning
 - datetime-kind-round-trip
@@ -45,7 +44,6 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - assert-equal-floats-no-tolerance
 - async-void-test-always-passes
 - static-state-leaks-between-tests
-- length-lies-about-emoji
 - baseaddress-eats-your-path
 - the-25-hour-day
 - poisoned-static-constructor
@@ -53,12 +51,6 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-renumbered-status
 - stale-tracked-entity
 - gettype-is-exact-not-assignable
-- substring-is-start-plus-length
-- char-plus-char-is-int
-- default-string-sort-is-cultural
-- object-string-equals-is-reference
-- mixed-plus-concatenates-left-to-right
-- string-hashcode-is-per-run
 
 ## Retired topics — do not propose the area at all
 

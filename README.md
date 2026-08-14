@@ -142,6 +142,6 @@ and the mechanic behind it.
 
 ## To Be Continued
 
-🌐 HTTP · ⚙️ Configuration · 🧵 Strings · 🔒 Security
+🌐 HTTP · ⚙️ Configuration · 🔒 Security
 
 <!-- EXHIBITS:END -->
