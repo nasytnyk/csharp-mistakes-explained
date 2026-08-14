@@ -3,7 +3,7 @@ id: "0062"
 title: StringContent defaults to text/plain
 category: http
 tags: [HTTP, HttpClient, StringContent]
-rule: "never post JSON with bare `new StringContent(json)` - it defaults to **text/plain**; set `application/json`"
+rule: "never post JSON with `new StringContent(json)` - it's **text/plain**, set `application/json`"
 ---
 
 # #0062 - StringContent Defaults to text/plain

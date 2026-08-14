@@ -142,7 +142,7 @@ and the mechanic behind it.
 
 ### 🌐 HTTP
 
-- [0062](src/http/0062-stringcontent-defaults-to-text-plain/) never post JSON with bare `new StringContent(json)` - it defaults to **text/plain**; set `application/json`
+- [0062](src/http/0062-stringcontent-defaults-to-text-plain/) never post JSON with `new StringContent(json)` - it's **text/plain**, set `application/json`
 
 ## To Be Continued
 
