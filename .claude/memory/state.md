@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **63** | Halls: **25** | Next free id: **0064**
-- Last updated after: #0063 (2026-08-13) - disposing-the-response-disposes-its-content
+- Exhibits: **64** | Halls: **25** | Next free id: **0065**
+- Last updated after: #0064 (2026-08-13) - missing-accept-header
 
 ## Exhibits shipped
 
@@ -72,6 +72,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0061 | reflection | invoke-wraps-the-exception | 5 |
 | 0062 | http | stringcontent-defaults-to-text-plain | 4,5 |
 | 0063 | http | disposing-the-response-disposes-its-content | 3,5 |
+| 0064 | http | missing-accept-header | 4,5 |
 
 ## Halls
 
