@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **61** | Halls: **24** | Next free id: **0062**
-- Last updated after: #0061 (2026-08-13) - invoke-wraps-the-exception
+- Exhibits: **62** | Halls: **25** | Next free id: **0063**
+- Last updated after: #0062 (2026-08-13) - timeout-looks-like-cancellation (opened 🌐 http hall)
 
 ## Exhibits shipped
 
@@ -70,6 +70,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0059 | io | read-without-seeking-to-start | 5 |
 | 0060 | reflection | changetype-chokes-on-nullable | 4 |
 | 0061 | reflection | invoke-wraps-the-exception | 5 |
+| 0062 | http | timeout-looks-like-cancellation | 4,5 |
 
 ## Halls
 
