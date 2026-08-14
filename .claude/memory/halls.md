@@ -39,15 +39,10 @@ per hall. New halls: add a row here first.
 | io | 📁 | IO & Files |
 | reflection | 🪞 | Reflection |
 | http | 🌐 | HTTP |
+| security | 🔒 | Security |
 
 ## Planned - ecosystem
 
 | slug | emoji | front-page name |
 |------|:--:|---|
 | configuration | ⚙️ | Configuration |
-
-## Planned - security
-
-| slug | emoji | front-page name |
-|------|:--:|---|
-| security | 🔒 | Security |

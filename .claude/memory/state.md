@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **64** | Halls: **25** | Next free id: **0065**
-- Last updated after: #0064 (2026-08-13) - missing-accept-header
+- Exhibits: **65** | Halls: **26** | Next free id: **0066**
+- Last updated after: #0065 (2026-08-13) - reversible-encryption-for-passwords (opened 🔒 security hall)
 
 ## Exhibits shipped
 
@@ -73,6 +73,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0062 | http | stringcontent-defaults-to-text-plain | 4,5 |
 | 0063 | http | disposing-the-response-disposes-its-content | 3,5 |
 | 0064 | http | missing-accept-header | 4,5 |
+| 0065 | security | reversible-encryption-for-passwords | 5 |
 
 ## Halls
 
