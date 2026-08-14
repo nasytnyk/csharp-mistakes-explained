@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **66** | Halls: **26** | Next free id: **0067**
-- Last updated after: #0066 (2026-08-13) - the-server-that-trusted-the-request
+- Exhibits: **67** | Halls: **26** | Next free id: **0068**
+- Last updated after: #0067 (2026-08-13) - leaking-exception-details
 
 ## Exhibits shipped
 
@@ -75,6 +75,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0064 | http | missing-accept-header | 4,5 |
 | 0065 | security | reversible-encryption-for-passwords | 5 |
 | 0066 | security | the-server-that-trusted-the-request | 4,5 |
+| 0067 | security | leaking-exception-details | 5 |
 
 ## Halls
 
