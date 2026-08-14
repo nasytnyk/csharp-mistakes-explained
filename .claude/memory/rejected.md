@@ -62,6 +62,8 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - host-allowlist-bypass
 - the-culture-that-bypassed-auth
 - unsalted-hash-reveals-duplicates
+- trusting-client-supplied-price
+- mass-assignment-over-posting
 
 ## Retired topics — do not propose the area at all
 
