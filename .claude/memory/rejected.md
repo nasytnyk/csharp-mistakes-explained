@@ -53,6 +53,7 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - gettype-is-exact-not-assignable
 - no-ensuresuccess-reads-error-body
 - request-messages-are-single-use
+- timeout-looks-like-cancellation
 
 ## Retired topics — do not propose the area at all
 
