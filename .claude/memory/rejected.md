@@ -53,6 +53,12 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-renumbered-status
 - stale-tracked-entity
 - gettype-is-exact-not-assignable
+- substring-is-start-plus-length
+- char-plus-char-is-int
+- default-string-sort-is-cultural
+- object-string-equals-is-reference
+- mixed-plus-concatenates-left-to-right
+- string-hashcode-is-per-run
 
 ## Retired topics — do not propose the area at all
 
