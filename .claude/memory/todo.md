@@ -48,6 +48,15 @@ Remaining framework/infra work. Consolidated 2026-07-24.
 
 ## Not yet started
 
+- **Front-page link should open the exhibit folder with a proper landing.** The
+  generated rows already point at the folder (`src/<hall>/<NNNN-slug>/`) rather
+  than a child README - which is the goal - but since the bilingual switch
+  (README-en.md / README-ua.md, no plain README.md) GitHub no longer
+  auto-renders a README in the folder view, so the link lands on a bare file
+  list. Decide the landing: e.g. have `gen-frontpage` emit a tiny stub
+  `README.md` per exhibit folder that just links to the `-en` / `-ua` pages (a
+  language chooser that renders), or otherwise make the folder show a rendered
+  page. (Curator ask, 2026-08-15.)
 - **Claiming / "taken" state in the backlog.** So two contributors don't build
   the same candidate. Not yet needed at current contributor volume; revisit if
   collisions become common.
