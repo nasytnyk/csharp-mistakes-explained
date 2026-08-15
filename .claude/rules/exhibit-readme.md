@@ -20,6 +20,11 @@ rule: "never enumerate a LINQ query twice - materialize it once"
 
 - `rule` is the exhibit's commandment - lowercase `never ...`. It is the **only**
   text the front page shows for this exhibit, so it has to stand alone.
+- **Keep it as short as an axiom can be.** Fewer words is better - a commandment,
+  not an explanation. Prefer `never <do X> - <the short fix>`, and cut any trailing
+  "because/how" clause once the rule stands on its own. If it reads like a sentence,
+  tighten it until it reads like a law. (The curator trims these aggressively; write
+  them pre-trimmed.)
 - `author: github-username` - **only on contributed exhibits.** The generator
   renders it as `(@username)` after the rule. The curator's own exhibits omit
   the field and stay uncredited, so a contributor's name stands out.

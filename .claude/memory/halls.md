@@ -40,9 +40,4 @@ per hall. New halls: add a row here first.
 | reflection | 🪞 | Reflection |
 | http | 🌐 | HTTP |
 | security | 🔒 | Security |
-
-## Planned - ecosystem
-
-| slug | emoji | front-page name |
-|------|:--:|---|
 | configuration | ⚙️ | Configuration |
