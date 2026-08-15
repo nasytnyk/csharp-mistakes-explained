@@ -23,8 +23,11 @@ foreach (var line in File.ReadAllLines(".claude/memory/halls.md"))
 }
 
 // 2. Exhibits: front-matter of every src/<hall>/<NNNN-slug>/README.md.
+//    Canonical readme per exhibit is README.md or README-en.md; translations
+//    (README-<lang>.md, e.g. README-ua.md) are skipped so each exhibit lists once.
 var exhibits = new List<(string Id, string Category, string Rule, string Folder, string Author)>();
-foreach (var path in Directory.GetFiles("src", "README.md", SearchOption.AllDirectories))
+foreach (var path in Directory.GetFiles("src", "README*.md", SearchOption.AllDirectories)
+    .Where(p => Path.GetFileName(p) is "README.md" or "README-en.md"))
 {
     var text = File.ReadAllText(path);
     var fm = Regex.Match(text, @"\A---\r?\n(.*?)\r?\n---", RegexOptions.Singleline);

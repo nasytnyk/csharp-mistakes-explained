@@ -34,6 +34,15 @@ rule: "never enumerate a LINQ query twice - materialize it once"
   Example: ``never mutate an object that serves as a **dictionary key**`` and
   ``never write `async void` outside **event handlers**``.
 
+## Filenames and translations
+
+- The exhibit page is `README.md` (or `README-en.md`) - either is the **canonical**
+  English page the front page uses. An optional `README-ua.md` (or another
+  `README-<lang>.md`) holds a translation alongside it: same section order, same
+  links, and translate the front-matter `title` and `rule` too - but keep `id`,
+  `category`, and `tags` unchanged. `gen-frontpage` lists the English canonical
+  once (translations are skipped); `check-links` validates every `README*.md`.
+
 ## Section order (fixed)
 
 1. `# #NNNN - Title` (this H1 keeps the bare `#NNNN` form)

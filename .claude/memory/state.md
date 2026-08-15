@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **71** | Halls: **27** | Next free id: **0072**
-- Last updated after: #0071 (2026-08-15) - bool-config-only-true-false
+- Exhibits: **72** | Halls: **27** | Next free id: **0073**
+- Last updated after: #0072 (2026-08-15) - the-total-that-wrapped
 
 ## Exhibits shipped
 
@@ -80,6 +80,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0069 | security | session-cookie-without-httponly-secure | 5 |
 | 0070 | configuration | env-var-overrides-appsettings | 4,5 |
 | 0071 | configuration | bool-config-only-true-false | 4,5 |
+| 0072 | numbers | the-total-that-wrapped | 5 |
 
 ## Halls
 

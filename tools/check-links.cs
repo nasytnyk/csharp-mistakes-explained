@@ -23,7 +23,7 @@ foreach (var hall in Directory.GetDirectories("src"))
 
 var problems = new List<string>();
 
-foreach (var readme in Directory.GetFiles("src", "README.md", SearchOption.AllDirectories))
+foreach (var readme in Directory.GetFiles("src", "README*.md", SearchOption.AllDirectories))
 {
     var folder = Path.GetDirectoryName(readme)!;
     var lines = File.ReadAllLines(readme);
