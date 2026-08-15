@@ -3,7 +3,7 @@ id: "0070"
 title: an environment variable silently overrides appsettings
 category: configuration
 tags: [configuration, appsettings, environment-variables]
-rule: "never assume **appsettings.json** is final - env vars and later providers override it silently"
+rule: "never assume **appsettings.json** is final - env vars override it"
 ---
 
 # #0070 - An Environment Variable Silently Overrides appsettings

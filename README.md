@@ -156,6 +156,6 @@ and the mechanic behind it.
 
 ### ⚙️ Configuration
 
-- [0070](src/configuration/0070-env-var-overrides-appsettings/) never assume **appsettings.json** is final - env vars and later providers override it silently
+- [0070](src/configuration/0070-env-var-overrides-appsettings/) never assume **appsettings.json** is final - env vars override it
 
 <!-- EXHIBITS:END -->
