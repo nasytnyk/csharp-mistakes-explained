@@ -20,7 +20,7 @@ and the mechanic behind it.
 - [0029](src/numbers/0029-nan-poisons-comparison/) never divide by a value that can be **zero**
 - [0050](src/numbers/0050-the-widening-that-came-too-late/) never trust a **wide** target type to fix `int` math - cast one operand first (@palkotnyk)
 - [0055](src/numbers/0055-decimal-keeps-its-scale/) never key or compare a `decimal` by its **text** - equal values keep different scales (`1.5m` vs `1.50m`)
-- [0072](src/numbers/0072-the-midpoint-that-overflowed/) never average two ints as `(a + b) / 2` - the sum **overflows**; use `a + (b - a) / 2`
+- [0072](src/numbers/0072-the-total-that-wrapped/) never assume int math throws on overflow - it **wraps**; use `checked`
 
 ### ⚡ Async & Threading
 
