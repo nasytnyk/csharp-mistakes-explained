@@ -70,6 +70,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-guard-that-cannot-fire
 - options-miss-the-reload
 - config-array-gap-truncates
+- readonly-collection-is-a-view
+- list-contains-is-reference-equality
+- list-sort-mutates-in-place
 
 ## Retired topics — do not propose the area at all
 

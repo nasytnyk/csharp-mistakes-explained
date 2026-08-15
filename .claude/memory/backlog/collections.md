@@ -50,6 +50,30 @@
 - **Verified:** ran on .NET 10 (2026-07-22): barrier repro, factory ran 2x,
   one value stored.
 
+### todictionary-throws-on-dup-key (A5)
+
+- **Twist:** `items.ToDictionary(x => x.Key)` throws `ArgumentException` the
+  first time a key repeats - index/group by a field that turns out non-unique
+  and it crashes on real data, not in the fixtures.
+- **Mechanic:** ToDictionary (and the `{ [k]=v }` initializer, and
+  `Dictionary.Add`) reject a duplicate key with ArgumentException ("An item with
+  the same key has already been added"). There is no last-wins overload;
+  `GroupBy`/`ToLookup` allow many-per-key, and the indexer (`dict[k]=v`) in a
+  loop overwrites (last wins).
+- **Who hits it:** indexing a collection by a supposedly-unique field (email,
+  SKU, name) that has a duplicate in production; keying by a foreign id that
+  isn't actually 1:1.
+- **Repro:** two items with the same key -> ToDictionary throws
+  ArgumentException; a GroupBy or an indexer loop handle it. Deterministic, no
+  packages.
+- **Damage:** a crash at startup or first request the moment real data contains
+  a duplicate the tests never had - far from the code that assumed uniqueness.
+- **😈 seed:** the reflexive fix is a try/catch or a `.Distinct()` that silently
+  drops a real row; choose GroupBy/ToLookup (keep all) or the indexer loop
+  (last wins) deliberately, per what the duplicate means.
+- **Verified:** ran on .NET 10 (2026-08-15): ToDictionary on a duplicate key
+  threw ArgumentException.
+
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
