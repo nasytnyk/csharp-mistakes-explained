@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **73** | Halls: **27** | Next free id: **0074**
-- Last updated after: #0073 (2026-08-15) - new-list-n-is-empty (bilingual: README-en + README-ua)
+- Exhibits: **74** | Halls: **27** | Next free id: **0075**
+- Last updated after: #0074 (2026-08-15) - todictionary-throws-on-dup-key (bilingual)
 
 ## Exhibits shipped
 
@@ -82,6 +82,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0071 | configuration | bool-config-only-true-false | 4,5 |
 | 0072 | numbers | the-total-that-wrapped | 5 |
 | 0073 | collections | new-list-n-is-empty | 4 |
+| 0074 | collections | todictionary-throws-on-dup-key | 5 |
 
 ## Halls
 
