@@ -3,19 +3,21 @@ id: "0076"
 title: a throwing constructor leaks the resource
 category: exceptions
 tags: [exceptions, IDisposable, constructors]
-rule: "never throw in a constructor after acquiring - `using` never runs, so **release** what you took"
+rule: "never throw while you still hold a resource you acquired earlier - **release it first**"
 ---
 
 # #0076 - A Throwing Constructor Leaks the Resource
 
 ## 💥 Symptom
 
-A connection pool (or file-handle pool, or semaphore) drains under load and no
-one can find the leak. Every `using` is in place, every `Dispose` looks correct -
-yet slots go out and never come back. It happens only on the failure path: the
-constructor of a resource-owning object acquires its slot, then hits a bad
-argument or a failed connect and throws, and the `using` you wrapped it in
-disposes nothing.
+The rule this exhibit teaches: **once you have acquired a resource, you must
+release it before you let an exception out - the `throw` will not do it for
+you.** Here it plays out in a constructor. A connection pool (or file-handle
+pool, or semaphore) drains under load and no one can find the leak. Every
+`using` is in place, every `Dispose` looks correct - yet slots go out and never
+come back. It happens only on the failure path: the constructor acquires its
+slot, then hits a bad argument or a failed connect and throws *while still
+holding that slot*, and the `using` you wrapped it in disposes nothing.
 
 ## 🔍 The Offending Code
 
@@ -46,11 +48,13 @@ that will ever run. `using` protected you against every failure *after*
 construction and none *during* it.
 
 The broken belief is "`using` guarantees Dispose, so the resource is safe." It
-guarantees Dispose only for a *successfully constructed* object. A constructor
-that acquires a resource and then does anything that can throw - validate an
-argument, open a socket, read config - has a window where the resource is live
-but the object is not, and an exception in that window leaks it silently, only on
-the error path your happy-path tests never exercise.
+guarantees Dispose only for a *successfully constructed* object. The moment you
+acquire a resource, *you* own releasing it until it is safely handed to a
+`using` or a field - and between the acquire and that hand-off, a `throw` walks
+straight past it. A constructor that acquires and then does anything that can
+throw - validate an argument, open a socket, read config - has exactly that
+window: the resource is live, the object is not, and an exception in it leaks the
+resource silently, only on the error path your happy-path tests never exercise.
 
 ## ✅ The Fix
 

@@ -61,7 +61,7 @@ and the mechanic behind it.
 - [0005](src/exceptions/0005-throw-ex-stack-amnesia/) never rethrow with `throw ex` - use bare `throw`
 - [0015](src/exceptions/0015-cancellation-eaten-by-catch/) never let a **catch-all** eat `OperationCanceledException`
 - [0017](src/exceptions/0017-finally-that-lied/) never let a `finally` block **throw**
-- [0076](src/exceptions/0076-ctor-throws-leaks-the-resource/) never throw in a constructor after acquiring - `using` never runs, so **release** what you took
+- [0076](src/exceptions/0076-ctor-throws-leaks-the-resource/) never throw while you still hold a resource you acquired earlier - **release it first**
 
 ### 🗄 ORM
 
