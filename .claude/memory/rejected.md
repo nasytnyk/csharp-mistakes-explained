@@ -86,6 +86,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-swallowed-filter
 - filter-side-effects-fire-anyway
 - unobserved-faulted-task-vanishes
+- equals-but-not-equal
+- equals-without-gethashcode
+- nan-equals-disagrees-with-operator
 
 ## Retired topics — do not propose the area at all
 
