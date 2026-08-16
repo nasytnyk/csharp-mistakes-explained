@@ -120,6 +120,8 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-subscription-you-forgot-to-dispose
 - the-cache-that-leaked-on-eviction
 - dispose-that-forgot-suppressfinalize
+- the-scope-you-didnt-capture
+- dispose-on-a-readonly-struct-hits-a-copy
 
 ## Retired topics — do not propose the area at all
 
