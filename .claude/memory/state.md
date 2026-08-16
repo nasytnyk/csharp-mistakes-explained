@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **75** | Halls: **27** | Next free id: **0076**
-- Last updated after: #0075 (2026-08-15) - default-struct-has-null-fields (bilingual)
+- Exhibits: **76** | Halls: **27** | Next free id: **0077**
+- Last updated after: #0076 (2026-08-16) - ctor-throws-leaks-the-resource (bilingual)
 
 ## Exhibits shipped
 
@@ -84,6 +84,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0073 | collections | new-list-n-is-empty | 4 |
 | 0074 | collections | todictionary-throws-on-dup-key | 5 |
 | 0075 | value-types | default-struct-has-null-fields | 4,5 |
+| 0076 | exceptions | ctor-throws-leaks-the-resource | 5 |
 
 ## Halls
 
