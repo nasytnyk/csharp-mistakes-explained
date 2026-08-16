@@ -104,6 +104,16 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - takewhile-isnt-where
 - index-after-where-renumbers
 - repeat-shares-the-reference
+- all-on-empty-is-true
+- orderby-orderby-isnt-thenby
+- range-second-arg-is-count
+- the-query-outlived-its-source
+- the-unflushed-tail
+- the-cleanup-that-never-came
+- the-callback-that-outlived-dispose
+- using-var-disposes-late
+- exit-skips-every-using (superseded by shipped #0077 finally-doesnt-always-run)
+- double-dispose-crashes
 
 ## Retired topics — do not propose the area at all
 
