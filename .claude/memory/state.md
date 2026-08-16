@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **80** | Halls: **27** | Next free id: **0081**
-- Last updated after: #0080 (2026-08-16) - env-array-needs-indexed-keys (bilingual)
+- Exhibits: **81** | Halls: **27** | Next free id: **0082**
+- Last updated after: #0081 (2026-08-16) - duplicate-key-crashes-config-load (bilingual)
 
 ## Exhibits shipped
 
@@ -89,6 +89,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0078 | disposal | the-transaction-that-rolled-itself-back | 5 |
 | 0079 | configuration | the-empty-env-var-that-crashed-binding | 5 |
 | 0080 | configuration | env-array-needs-indexed-keys | 5 |
+| 0081 | configuration | duplicate-key-crashes-config-load | 5 |
 
 ## Halls
 
