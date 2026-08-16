@@ -122,6 +122,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - dispose-that-forgot-suppressfinalize
 - the-scope-you-didnt-capture
 - dispose-on-a-readonly-struct-hits-a-copy
+- arrays-merge-they-dont-replace
+- config-has-no-variable-substitution
+- the-typo-that-became-a-default
 
 ## Retired topics — do not propose the area at all
 
