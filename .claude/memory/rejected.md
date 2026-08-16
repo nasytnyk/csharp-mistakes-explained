@@ -89,6 +89,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - equals-but-not-equal
 - equals-without-gethashcode
 - nan-equals-disagrees-with-operator
+- record-value-equality-is-shallow
+- operator-equals-binds-to-the-static-type
+- the-mutated-key-vanishes
+- record-equality-demands-the-same-runtime-type
 
 ## Retired topics — do not propose the area at all
 
