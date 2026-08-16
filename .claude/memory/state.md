@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **78** | Halls: **27** | Next free id: **0079**
-- Last updated after: #0078 (2026-08-16) - the-transaction-that-rolled-itself-back (bilingual)
+- Exhibits: **79** | Halls: **27** | Next free id: **0080**
+- Last updated after: #0079 (2026-08-16) - the-empty-env-var-that-crashed-binding (bilingual)
 
 ## Exhibits shipped
 
@@ -87,6 +87,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0076 | exceptions | ctor-throws-leaks-the-resource | 5 |
 | 0077 | exceptions | finally-doesnt-always-run | 5 |
 | 0078 | disposal | the-transaction-that-rolled-itself-back | 5 |
+| 0079 | configuration | the-empty-env-var-that-crashed-binding | 5 |
 
 ## Halls
 
