@@ -117,6 +117,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - dispose-throws-and-the-rest-leak
 - the-brace-that-threw
 - the-disposed-before-the-await
+- the-subscription-you-forgot-to-dispose
+- the-cache-that-leaked-on-eviction
+- dispose-that-forgot-suppressfinalize
 
 ## Retired topics — do not propose the area at all
 
