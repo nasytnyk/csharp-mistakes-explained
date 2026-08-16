@@ -165,8 +165,8 @@ and the mechanic behind it.
 
 - [0070](src/configuration/0070-env-var-overrides-appsettings/) never assume **appsettings.json** is final - env vars override it
 - [0071](src/configuration/0071-bool-config-only-true-false/) never write a config bool as **1** or yes - only `true`/`false` parse
-- [0079](src/configuration/0079-the-empty-env-var-that-crashed-binding/) a present-but-empty env var is a value - it overrides your default and **breaks typed binding**
-- [0080](src/configuration/0080-env-array-needs-indexed-keys/) an array from an env var needs indexed keys (`KEY__0`, `KEY__1`) - a comma **won't split**
-- [0081](src/configuration/0081-duplicate-key-crashes-config-load/) a duplicate key in appsettings is not 'last wins' - the JSON provider **refuses to load the file**
+- [0079](src/configuration/0079-the-empty-env-var-that-crashed-binding/) never let a present-but-empty env var pass for 'unset'
+- [0080](src/configuration/0080-env-array-needs-indexed-keys/) never pack an array into one env var - give each item an indexed key (`KEY__0`, `KEY__1`)
+- [0081](src/configuration/0081-duplicate-key-crashes-config-load/) never leave a duplicate key in appsettings - the JSON provider **won't load the file**
 
 <!-- EXHIBITS:END -->

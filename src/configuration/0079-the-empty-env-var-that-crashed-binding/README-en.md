@@ -3,7 +3,7 @@ id: "0079"
 title: the empty env var that crashed binding
 category: configuration
 tags: [configuration, environment-variables, binding]
-rule: "a present-but-empty env var is a value - it overrides your default and **breaks typed binding**"
+rule: "never let a present-but-empty env var pass for 'unset'"
 ---
 
 # #0079 - The Empty Env Var That Crashed Binding

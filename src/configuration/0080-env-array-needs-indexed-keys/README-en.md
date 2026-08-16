@@ -3,7 +3,7 @@ id: "0080"
 title: env array needs indexed keys
 category: configuration
 tags: [configuration, environment-variables, arrays]
-rule: "an array from an env var needs indexed keys (`KEY__0`, `KEY__1`) - a comma **won't split**"
+rule: "never pack an array into one env var - give each item an indexed key (`KEY__0`, `KEY__1`)"
 ---
 
 # #0080 - An Env Array Needs Indexed Keys

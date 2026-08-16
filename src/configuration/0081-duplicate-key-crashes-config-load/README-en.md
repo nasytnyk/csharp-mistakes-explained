@@ -3,7 +3,7 @@ id: "0081"
 title: a duplicate key crashes config load
 category: configuration
 tags: [configuration, json, appsettings]
-rule: "a duplicate key in appsettings is not 'last wins' - the JSON provider **refuses to load the file**"
+rule: "never leave a duplicate key in appsettings - the JSON provider **won't load the file**"
 ---
 
 # #0081 - A Duplicate Key Crashes Config Load
