@@ -114,6 +114,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - using-var-disposes-late
 - exit-skips-every-using (superseded by shipped #0077 finally-doesnt-always-run)
 - double-dispose-crashes
+- dispose-throws-and-the-rest-leak
+- the-brace-that-threw
+- the-disposed-before-the-await
 
 ## Retired topics — do not propose the area at all
 
