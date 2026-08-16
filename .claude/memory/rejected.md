@@ -78,6 +78,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-vanishing-mutation
 - the-skipped-initializer
 - the-copy-returning-getter
+- the-exception-that-waited
+- cancellation-logged-as-an-error
+- catch-all-misses-stackoverflow
 
 ## Retired topics — do not propose the area at all
 

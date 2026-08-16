@@ -126,6 +126,33 @@
   false verdict (outer catch took the exception), and ran before the inner
   finally.
 
+### catch-all-hides-your-own-bug (A5)
+
+- **Twist:** a broad `catch (Exception) { return fallback; }` swallows a
+  `NullReferenceException` / `IndexOutOfRangeException` that is a *bug in your own
+  code*, so a coding error silently becomes a "handled" business fallback -
+  wrong result, green logs, no stack trace anywhere.
+- **Mechanic:** `catch (Exception)` matches every exception, including the
+  runtime ones your bugs throw (NRE, IndexOutOfRange, InvalidCast, your own
+  ArgumentException). The handler cannot tell "the dependency failed" from "I
+  have a typo," so a programming error is indistinguishable from an expected
+  failure and takes the same fallback path (return 0 / empty / false).
+- **Who hits it:** resilience-flavored try/catch wrapped around whole methods or
+  requests - "if anything goes wrong, return default." The catch that was meant
+  for a flaky dependency also eats the author's own bugs.
+- **Repro:** a try block with a real bug (index past the end / null deref) under
+  `catch (Exception)` returning a fallback; the fallback runs, the expected
+  result never appears, and nothing logs the actual exception. Deterministic, no
+  packages.
+- **Damage:** bugs ship as silent fallbacks - a mispriced order returns 0, a
+  permission check returns false, a parse returns default - and because the NRE
+  never surfaced, it never gets fixed; only the wrong output remains.
+- **😈 seed:** catch the *specific* exceptions the dependency documents, and let
+  programming bugs crash (or at least log at Error with the stack); a catch-all
+  that returns a fallback is a bug-hider, not resilience.
+- **Verified:** language behavior (catch Exception matches NRE/IndexOutOfRange);
+  verify the self-audit at build.
+
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
