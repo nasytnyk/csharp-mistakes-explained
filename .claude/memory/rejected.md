@@ -73,6 +73,8 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - readonly-collection-is-a-view
 - list-contains-is-reference-equality
 - list-sort-mutates-in-place
+- struct-tostring-is-the-type-name
+- valuetuple-vs-tuple-equality
 
 ## Retired topics — do not propose the area at all
 
