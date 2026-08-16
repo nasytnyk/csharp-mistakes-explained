@@ -80,32 +80,6 @@
 - **Verified:** ran on .NET 10 (2026-07-24): property getter no-op (X=0),
   struct field mutated in place (X=10).
 
-### default-struct-has-null-fields (A4,5)
+## Seeds
 
-- **Twist:** `default(Cart)` and `new Cart[1][0]` skip the constructor, so a
-  struct that "always initializes its list" hands you a null one - and the
-  first `.Items.Add(...)` throws NullReferenceException from an object that
-  looks fully constructed.
-- **Mechanic:** `default(T)` and array allocation zero the memory and run no
-  constructor and no field initializers, so every reference field
-  (`List<T>`, `string`, a nested class) is null. The struct's own type says
-  nothing is nullable; the value simply never ran the code that would fill
-  them. This is the-skipped-initializer's sibling one rung *up* the fear
-  ladder: value fields come back 0/false (silently wrong), reference fields
-  come back null (a crash).
-- **Who hits it:** structs holding a collection or string, materialized
-  through `default`, `new T[n]`, an uninitialized field, or an `out`
-  parameter - then handed to code that trusts the constructor ran.
-- **Repro:** `struct Cart { public List<string> Items; public Cart() {
-  Items = new(); } }`; `new Cart()` works, `default(Cart).Items` is null and
-  `.Add` throws NRE, `new Cart[1][0].Items` is null too. Deterministic, no
-  packages.
-- **Damage:** NRE from a value the type system swears is constructed -
-  arising far from the `default`/array that made it, so the crash site and
-  the cause sit in different components.
-- **😈 seed:** cross-link the-skipped-initializer: same "default skips
-  construction" root, opposite fear rung - the value-field version is
-  silently wrong (a 0 multiplier), the reference-field version at least
-  crashes loudly; the quiet one is the dangerous one.
-- **Verified:** ran on .NET 10 (2026-07-24): default(Cart) and
-  new Cart[1][0] had null Items and null Name; `.Items.Add` threw NRE.
+Not yet a full candidate - brainstorm before proposing.
