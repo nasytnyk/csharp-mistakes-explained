@@ -93,6 +93,13 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - operator-equals-binds-to-the-static-type
 - the-mutated-key-vanishes
 - record-equality-demands-the-same-runtime-type
+- datetimeoffset-equals-compares-the-instant
+- sorted-set-dedups-by-comparer-not-equals
+- uri-equality-ignores-the-fragment
+- arrays-have-no-value-equality
+- average-ignores-the-nulls
+- zip-drops-the-tail
+- distinctby-keeps-the-wrong-one
 
 ## Retired topics — do not propose the area at all
 
