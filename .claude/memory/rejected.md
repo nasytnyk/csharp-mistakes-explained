@@ -75,6 +75,9 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - list-sort-mutates-in-place
 - struct-tostring-is-the-type-name
 - valuetuple-vs-tuple-equality
+- the-vanishing-mutation
+- the-skipped-initializer
+- the-copy-returning-getter
 
 ## Retired topics — do not propose the area at all
 
