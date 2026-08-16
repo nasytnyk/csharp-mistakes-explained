@@ -125,6 +125,7 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - arrays-merge-they-dont-replace
 - config-has-no-variable-substitution
 - the-typo-that-became-a-default
+- bind-appends-to-default-collections
 
 ## Retired topics — do not propose the area at all
 
