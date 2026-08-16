@@ -100,6 +100,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - average-ignores-the-nulls
 - zip-drops-the-tail
 - distinctby-keeps-the-wrong-one
+- the-query-that-saw-the-change
+- takewhile-isnt-where
+- index-after-where-renumbers
+- repeat-shares-the-reference
 
 ## Retired topics — do not propose the area at all
 
