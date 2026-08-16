@@ -81,6 +81,11 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-exception-that-waited
 - cancellation-logged-as-an-error
 - catch-all-misses-stackoverflow
+- catch-all-hides-your-own-bug
+- result-wraps-await-unwraps
+- the-swallowed-filter
+- filter-side-effects-fire-anyway
+- unobserved-faulted-task-vanishes
 
 ## Retired topics — do not propose the area at all
 
