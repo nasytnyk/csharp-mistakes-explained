@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **76** | Halls: **27** | Next free id: **0077**
-- Last updated after: #0076 (2026-08-16) - ctor-throws-leaks-the-resource (bilingual)
+- Exhibits: **77** | Halls: **27** | Next free id: **0078**
+- Last updated after: #0077 (2026-08-16) - finally-doesnt-always-run (bilingual)
 
 ## Exhibits shipped
 
@@ -85,6 +85,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0074 | collections | todictionary-throws-on-dup-key | 5 |
 | 0075 | value-types | default-struct-has-null-fields | 4,5 |
 | 0076 | exceptions | ctor-throws-leaks-the-resource | 5 |
+| 0077 | exceptions | finally-doesnt-always-run | 5 |
 
 ## Halls
 
