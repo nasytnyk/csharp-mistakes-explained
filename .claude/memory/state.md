@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **81** | Halls: **27** | Next free id: **0082**
-- Last updated after: #0081 (2026-08-16) - duplicate-key-crashes-config-load (bilingual)
+- Exhibits: **82** | Halls: **27** | Next free id: **0083**
+- Last updated after: #0082 (2026-08-16) - the-null-that-took-the-else (bilingual)
 
 ## Exhibits shipped
 
@@ -90,6 +90,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0079 | configuration | the-empty-env-var-that-crashed-binding | 5 |
 | 0080 | configuration | env-array-needs-indexed-keys | 5 |
 | 0081 | configuration | duplicate-key-crashes-config-load | 5 |
+| 0082 | nullability | the-null-that-took-the-else | 4,5 |
 
 ## Halls
 
