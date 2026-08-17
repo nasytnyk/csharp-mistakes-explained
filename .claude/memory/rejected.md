@@ -132,6 +132,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - is-null-is-the-only-safe-null-check
 - json-skips-your-fields
 - record-struct-is-mutable
+- the-attribute-your-serializer-ignored
+- immutable-add-is-a-no-op-you-ignored
+- double-overflows-to-infinity
+- the-hijacked-null-check (== null runs the overloaded operator; same as the rejected is-null-is-the-only-safe-null-check)
 
 ## Retired topics — do not propose the area at all
 

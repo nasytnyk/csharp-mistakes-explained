@@ -70,47 +70,6 @@
   false, switch fell to default; Newtonsoft run confirmed `{"code": 5}`
   arrives as System.Int64 and misses `case 5`.
 
-### the-hijacked-null-check (A4)
-
-- **Twist:** `if (order == null)` does not check for null - it calls
-  whatever `operator ==` the class defined, which can answer true for a
-  live object, or throw NullReferenceException *from the null check
-  itself*. `is null` is the spelling the class cannot hijack.
-- **Mechanic:** `==` against `null` dispatches to a user-defined operator
-  when one exists; only `is null` / `is not null` are guaranteed
-  reference-vs-null tests (constant pattern, no operator lookup). Two
-  realistic operator bugs: (a) the ?.-style body `a?.Id == b?.Id` makes any
-  object with an unassigned Id compare equal to null; (b) the unguarded
-  body `a.Key == b.Key` makes `e == null` throw NRE inside the operator.
-  Both compile clean when Equals/GetHashCode are overridden alongside.
-- **Who hits it:** codebases with equality-overloading value objects and
-  entities (Money, EntityId, DDD aggregates) - the overload is written for
-  value semantics, then every plain `== null` guard in the codebase quietly
-  routes through it. EF/Unity developers know the genre; console-honest
-  version needs no framework.
-- **Repro:** class Order with `Guid? Id` and operator == comparing
-  `a?.Id == b?.Id`: `new Order() == null` prints true while
-  `new Order() is null` prints false - an unsaved order "is" null. Second
-  act: the unguarded operator variant throws NRE on `e == null`.
-  Deterministic, no packages.
-- **Damage:** the cache-miss branch fires for an object that exists -
-  re-fetch, duplicate insert, "not found" for a record the user is looking
-  at; in the NRE variant, the defensive guard is the crash site, which
-  reads as impossible in the stack trace.
-- **NOTE on hall placement:** equality hall has `equals-but-not-equal`
-  (Equals overridden, == forgotten - the two regimes drift apart). This is
-  the complementary failure - == *was* overridden and now lies about null -
-  and it lives here because the broken belief is "`is null` is just syntax
-  sugar for `== null`". Flagged so the curator can move it if he reads the
-  center of gravity differently.
-- **😈 seed:** `is null` fixes the guard you rewrote - but every
-  `Assert.AreEqual(null, order)`, LINQ `FirstOrDefault() == null`, and
-  third-party helper still calls the operator, so the codebase disagrees
-  with itself about which objects exist.
-- **Verified:** ran on .NET 10 (2026-07-22): `?.`-body operator gave
-  `unsaved == null` true / `is null` false; unguarded-body operator threw
-  NRE from `e == null`.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
