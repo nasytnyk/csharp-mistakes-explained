@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **82** | Halls: **27** | Next free id: **0083**
-- Last updated after: #0082 (2026-08-16) - the-null-that-took-the-else (bilingual)
+- Exhibits: **83** | Halls: **27** | Next free id: **0084**
+- Last updated after: #0083 (2026-08-16) - raising-an-event-with-no-subscribers-nres (bilingual)
 
 ## Exhibits shipped
 
@@ -91,6 +91,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0080 | configuration | env-array-needs-indexed-keys | 5 |
 | 0081 | configuration | duplicate-key-crashes-config-load | 5 |
 | 0082 | nullability | the-null-that-took-the-else | 4,5 |
+| 0083 | events | raising-an-event-with-no-subscribers-nres | 1,5 |
 
 ## Halls
 
