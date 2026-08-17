@@ -126,6 +126,12 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - config-has-no-variable-substitution
 - the-typo-that-became-a-default
 - bind-appends-to-default-collections
+- addmonths-clamps-and-forgets-the-day
+- negative-modulo-breaks-the-bucket
+- abs-of-minvalue-throws
+- is-null-is-the-only-safe-null-check
+- json-skips-your-fields
+- record-struct-is-mutable
 
 ## Retired topics — do not propose the area at all
 
