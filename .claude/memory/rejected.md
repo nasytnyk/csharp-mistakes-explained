@@ -137,6 +137,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - double-overflows-to-infinity
 - log-placeholders-bind-by-position
 - default-t-cant-tell-missing-from-zero
+- convert-and-cast-round-differently
+- range-on-an-array-copies
+- index-from-end-zero-is-out-of-range
+- dictionary-is-case-sensitive
 - the-hijacked-null-check (== null runs the overloaded operator; same as the rejected is-null-is-the-only-safe-null-check)
 
 ## Retired topics — do not propose the area at all
