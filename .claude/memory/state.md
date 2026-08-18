@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **84** | Halls: **27** | Next free id: **0085**
-- Last updated after: #0084 (2026-08-16) - the-transient-that-piled-up (bilingual)
+- Exhibits: **85** | Halls: **27** | Next free id: **0086**
+- Last updated after: #0085 (2026-08-16) - type-pattern-skips-null (bilingual)
 
 ## Exhibits shipped
 
@@ -93,6 +93,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0082 | nullability | the-null-that-took-the-else | 4,5 |
 | 0083 | events | raising-an-event-with-no-subscribers-nres | 1,5 |
 | 0084 | di-lifetimes | the-transient-that-piled-up | 5,6 |
+| 0085 | pattern-matching | type-pattern-skips-null | 5 |
 
 ## Halls
 

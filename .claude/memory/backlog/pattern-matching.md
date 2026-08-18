@@ -70,34 +70,6 @@
   false, switch fell to default; Newtonsoft run confirmed `{"code": 5}`
   arrives as System.Int64 and misses `case 5`.
 
-### type-pattern-skips-null (A5)
-
-- **Twist:** `case string s:` / `is string s` does not match null - null is not
-  an instance of any type - so a null value slips past the arm that "handles
-  strings" and lands in the `default`/`_` arm meant for *other* types.
-- **Mechanic:** a type pattern is effectively `value is T && value is not null`;
-  null fails the instance test for every `T`, so it always falls through to `_`.
-  If the default arm means "unknown/unsupported type" (reject, throw, log-and-
-  drop), a null - which is really an empty/absent *string* - gets misclassified
-  as a foreign type instead of an empty one.
-- **Who hits it:** switch/if dispatch over `object`/nullable inputs from a
-  deserializer, data reader, config value, or DTO field, where null should mean
-  "empty/absent" but the code routes it to the "some other type" branch.
-- **Repro:** `object? value = null; value switch { string s => "string", int n =>
-  "int", _ => "other" }` returns "other". Deterministic, packageless.
-- **Damage:** null routed to the wrong handler - an absent name treated as an
-  unsupported type, a default branch (throw / "unhandled" / drop) firing for what
-  is really a missing string; the string arm's logic silently never runs for
-  null.
-- **ADJACENCY:** cross-links #0027 null-comparisons-are-always-false (equality)
-  and shipped #0033 switch-expression-not-exhaustive; distinct - here null
-  silently skips a *matching* type arm rather than being uncompared or unhandled.
-- **😈 seed:** `case string { Length: > 0 }` skips empty string too, so a null
-  and an empty string take the same wrong branch for two different reasons; and
-  arm order (`null =>` before/after `string s =>`) changes the fix.
-- **Verified:** ran on .NET 10 (2026-08-16): null routed to the `_` arm, not the
-  `string s` arm.
-
 ## Seeds
 
 Not yet a full candidate - brainstorm before proposing.
