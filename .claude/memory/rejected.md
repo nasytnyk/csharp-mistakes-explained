@@ -146,12 +146,11 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - the-default-interface-method-you-couldnt-call
 - dictionary-values-are-a-live-view
 - the-hijacked-null-check (== null runs the overloaded operator; same as the rejected is-null-is-the-only-safe-null-check)
-- the-penny-that-didnt-add-up
-- the-exception-you-logged-without-the-exception
-- the-default-interface-method-you-couldnt-call
-- dictionary-values-are-a-live-view
 - the-getter-that-leaked-its-list
 - the-json-element-that-outlived-its-document
+- the-non-null-array-full-of-nulls
+- timespan-hours-isnt-total-hours
+- the-unsigned-loop-that-never-ends
 
 ## Retired topics — do not propose the area at all
 

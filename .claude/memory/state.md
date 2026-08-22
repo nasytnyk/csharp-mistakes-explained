@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **87** | Halls: **27** | Next free id: **0088**
-- Last updated after: #0087 (2026-08-16) - readonly-array-isnt-readonly (bilingual)
+- Exhibits: **88** | Halls: **27** | Next free id: **0089**
+- Last updated after: #0088 (2026-08-16) - stj-wont-read-a-quoted-number (bilingual)
 
 ## Exhibits shipped
 
@@ -96,6 +96,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0085 | pattern-matching | type-pattern-skips-null | 5 |
 | 0086 | async | the-async-lambda-that-became-void | 1,5 |
 | 0087 | collections | readonly-array-isnt-readonly | 5,6 |
+| 0088 | serialization | stj-wont-read-a-quoted-number | 5 |
 
 ## Halls
 
