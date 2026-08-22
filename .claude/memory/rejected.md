@@ -142,6 +142,12 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - index-from-end-zero-is-out-of-range
 - dictionary-is-case-sensitive
 - the-hijacked-null-check (== null runs the overloaded operator; same as the rejected is-null-is-the-only-safe-null-check)
+- the-penny-that-didnt-add-up
+- the-exception-you-logged-without-the-exception
+- the-default-interface-method-you-couldnt-call
+- dictionary-values-are-a-live-view
+- the-getter-that-leaked-its-list
+- the-json-element-that-outlived-its-document
 
 ## Retired topics — do not propose the area at all
 
