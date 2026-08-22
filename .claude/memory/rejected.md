@@ -141,6 +141,10 @@ why. (Shipped exhibits and numbering live in `state.md`.)
 - range-on-an-array-copies
 - index-from-end-zero-is-out-of-range
 - dictionary-is-case-sensitive
+- the-penny-that-didnt-add-up
+- the-exception-you-logged-without-the-exception
+- the-default-interface-method-you-couldnt-call
+- dictionary-values-are-a-live-view
 - the-hijacked-null-check (== null runs the overloaded operator; same as the rejected is-null-is-the-only-safe-null-check)
 - the-penny-that-didnt-add-up
 - the-exception-you-logged-without-the-exception
