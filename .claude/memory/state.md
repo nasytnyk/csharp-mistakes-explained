@@ -2,8 +2,8 @@
 
 _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 
-- Exhibits: **86** | Halls: **27** | Next free id: **0087**
-- Last updated after: #0086 (2026-08-16) - the-async-lambda-that-became-void (bilingual)
+- Exhibits: **87** | Halls: **27** | Next free id: **0088**
+- Last updated after: #0087 (2026-08-16) - readonly-array-isnt-readonly (bilingual)
 
 ## Exhibits shipped
 
@@ -95,6 +95,7 @@ _Snapshot; `dotnet run tools/next-id.cs` is authoritative for numbering._
 | 0084 | di-lifetimes | the-transient-that-piled-up | 5,6 |
 | 0085 | pattern-matching | type-pattern-skips-null | 5 |
 | 0086 | async | the-async-lambda-that-became-void | 1,5 |
+| 0087 | collections | readonly-array-isnt-readonly | 5,6 |
 
 ## Halls
 
